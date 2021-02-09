@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  auditee:
+    build:
+      context: .
+    volumes:
+      - ./auditee:/usr/src/auditee
+      - ./pyproject.toml:/usr/src/pyproject.toml
+      - ./setup.cfg:/usr/src/setup.cfg
+      - ./setup.py:/usr/src/setup.py
