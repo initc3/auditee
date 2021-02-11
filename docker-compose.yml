@@ -4,8 +4,31 @@ services:
   auditee:
     build:
       context: .
+      dockerfile: Dockerfile
+    environment:
+      PYTHONBREAKPOINT: ipdb.set_trace
     volumes:
       - ./auditee:/usr/src/auditee
+      - ./docs:/usr/src/docs
       - ./pyproject.toml:/usr/src/pyproject.toml
       - ./setup.cfg:/usr/src/setup.cfg
       - ./setup.py:/usr/src/setup.py
+      - ./tests:/usr/src/tests
+  builddocs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./auditee:/usr/src/auditee
+      - ./docs:/usr/src/docs
+      - ./pyproject.toml:/usr/src/pyproject.toml
+      - ./setup.cfg:/usr/src/setup.cfg
+      - ./setup.py:/usr/src/setup.py
+      - ./tests:/usr/src/tests
+    command: make -C docs html
+  viewdocs:
+    image: nginx
+    ports:
+      - '57333:80'
+    volumes:
+      - ./docs/_build/html:/usr/share/nginx/html

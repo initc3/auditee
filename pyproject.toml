@@ -1,3 +1,5 @@
+# https://setuptools.readthedocs.io/en/latest/userguide/distribution.html#distributing-extensions-compiled-with-cython
 [build-system]
+#requires = ["setuptools", "cython"]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
