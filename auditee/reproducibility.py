@@ -15,7 +15,12 @@ ReportItem = namedtuple("ReportItem", ("matches", "expected", "computed"))
 
 
 def verify(
-    signed_enclave, unsigned_enclave, enclave_config, signing_key=None, verbose=True
+    signed_enclave,
+    unsigned_enclave,
+    enclave_config,
+    signing_key=None,
+    show_mrsigner=False,
+    verbose=True,
 ):
     """Sign the enclave_so, and compare with the signed_enclave.
 
@@ -25,6 +30,8 @@ def verify(
     :param str enclave_config: The enclave configuration used to sign
         the enclave.
     :param str signing_key: The private key used to sign the enclave.
+    :param bool show_mrsigner: Whether to show the mrsigner field or not.
+        Defaults to ``False``.
     :param bool verbose: Whether to use verbose mode or not.
         Defaults to ``True``.
     """
@@ -46,13 +53,15 @@ def verify(
     }
     report = ReproducibilityReport(**report_data)
     if verbose:
-        print_report(report)
+        print_report(report, show_mrsigner=show_mrsigner)
     return report
 
 
-def print_report(report):
+def print_report(report, show_mrsigner=False):
     print(f"\n{term.bold}Reproducibility Report\n----------------------")
     for attr, val in report._asdict().items():
+        if attr == "mrsigner" and not show_mrsigner:
+            continue
         print(f"{term.bold}{attr}:{term.normal}")
         for k, v in val._asdict().items():
             if attr in ("mrenclave", "mrsigner") and k in ("expected", "computed"):

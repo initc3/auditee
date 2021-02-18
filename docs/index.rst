@@ -84,7 +84,7 @@ function, ``print_report``, to print a report to the terminal:
 
     >>> auditee.print_report(report)
 
-.. image:: _static/report.png
+.. image:: _static/report_without_mrsigner.png
 
 
 
