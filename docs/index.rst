@@ -12,6 +12,7 @@ auditee
     :maxdepth: 1
 
     sgx
+    demo
     credits
 
 Prerequisites

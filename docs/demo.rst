@@ -9,7 +9,9 @@ Demo
 
     from auditee.bindings.quote import read_sgx_quote_body_b64
 
-    url = 'https://api.trustedservices.intel.com/sgx/dev/attestation/v4/report'
+    ias_url = "https://api.trustedservices.intel.com/sgx/dev"
+    verify_endpoint = "/attestation/v4/report"
+    url = ias_url + verify_endpoint
     headers = {
         'Content-Type': 'application/json',
         'Ocp-Apim-Subscription-Key': '5d5382b9c574451e92a007f4bc540dd4'
