@@ -38,7 +38,7 @@ class IASReport:
     sgx_quote_t: Any = field(init=False)
 
     def __post_init__(self):
-        self.sgx_quote_t = deserialize_quote_body(self.isv_enclave_quote_body)
+        self.sgx_quote_t = unpack_b64_quote_body(self.isv_enclave_quote_body)
 
     @classmethod
     def from_ias_report(cls, report):
@@ -79,9 +79,12 @@ def send_quote(quote, *, ias_primary_key=None):
         #     (due to a temporary overloading or maintenance). This is a temporary
         #     state –the same request can be repeated after some time.
         raise NotImplementedError(f"Request failed with status code {res.status_code}")
-    return res.json()
+    # TODO verify certs and signature, in header -- return headers, or just return
+    # response object
+    # return res.json()
+    return res
 
 
-def deserialize_quote_body(b64_quote_body):
+def unpack_b64_quote_body(b64_quote_body):
     quote_body = read_sgx_quote_body_b64(b64_quote_body)
     return quote_body
