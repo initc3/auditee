@@ -13,4 +13,4 @@ report, signed by Intel. If the MRENCLAVE is the same for all three, then an aud
 can link the different observations from auditing the source code, to the signed
 enclave binary and to its deployment, to which the attestation report corresponds.
 """
-from auditee.reproducibility import print_report, verify  # noqa F401
+from auditee.reproducibility import print_report, verify, verify_mrenclave  # noqa F401

@@ -10,10 +10,12 @@ services:
     volumes:
       - ./auditee:/usr/src/auditee
       - ./docs:/usr/src/docs
+      - ./examples:/usr/src/examples
       - ./pyproject.toml:/usr/src/pyproject.toml
       - ./setup.cfg:/usr/src/setup.cfg
       - ./setup.py:/usr/src/setup.py
       - ./tests:/usr/src/tests
+      - /var/run/docker.sock:/var/run/docker.sock
   builddocs:
     build:
       context: .

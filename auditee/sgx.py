@@ -115,6 +115,9 @@ def sign(enclave, *, key, out, config):
             -config enclave/Enclave.config.xml
     """
     _sign(enclave=enclave, key=key, out=out, config=config)
+    # FIXME handle errors in the above call, rather than proceeding forward despite
+    # errors -- for instance, errors in signing can result in no file being written
+    # to 'out' thus causing the following open() instruction to fail.
     with open(out, "rb") as f:
         signed_enclave_bytes = f.read()
     return signed_enclave_bytes

@@ -3,6 +3,8 @@ from collections import namedtuple
 
 from blessings import Terminal
 from colorama import init as init_colorama  # , Fore, Back, Style
+from python_on_whales import docker
+
 from auditee.sgx import Sigstruct, sign as sgx_sign
 
 init_colorama()
@@ -12,6 +14,50 @@ ReproducibilityReport = namedtuple(
     "ReproducibilityReport", ("mrenclave", "isvprodid", "isvsvn", "mrsigner")
 )
 ReportItem = namedtuple("ReportItem", ("matches", "expected", "computed"))
+
+
+def verify_mrenclave(
+    docker_build_attrs,
+    signed_enclave,
+    enclave_config,
+    *,
+    ias_report=None,
+    unsigned_enclave_filename="Enclave.so",
+):
+    """Verifies if the MRENCLAVE of the provided signed enclave matches
+    with the one obtained when rebuilding the enclave from source, and
+    the one in the IAS report.
+
+    Example
+    -------
+    docker_build_attrs = {'target': 'export-stage'}
+
+    """
+    context_path = docker_build_attrs.pop("context_path", ".")
+    output = docker_build_attrs.pop("output", {"type": "local", "dest": "out"})
+    # target="export-stage", output={"type": "local", "dest": "out"}
+    docker.build(context_path, output=output, **docker_build_attrs)
+
+    unsigned_enclave = pathlib.Path(output["dest"]).joinpath(unsigned_enclave_filename)
+    signing_key = pathlib.Path(__file__).parent.resolve().joinpath("signing_key.pem")
+    dev_sigstruct = Sigstruct.from_enclave_file(signed_enclave)
+    out = "/tmp/audit_enclave.signed.so"
+    sgx_sign(unsigned_enclave, key=signing_key, out=out, config=enclave_config)
+    auditor_sigstruct = Sigstruct.from_enclave_file(out)
+    if not ias_report:
+        print(
+            f"\nsigned enclave NMRENCLAVE: \t\t{term.bold}{dev_sigstruct.mrenclave.hex()}{term.normal}"
+        )
+        print(
+            f"built-from-source enclave NMRENCLAVE: \t{term.bold}{auditor_sigstruct.mrenclave.hex()}{term.normal}\n"
+        )
+        if auditor_sigstruct.mrenclave == dev_sigstruct.mrenclave:
+            print(f"{term.green}MRENCLAVE match!{term.normal}")
+        else:
+            print(f"{term.red}MRENCLAVE do not match!{term.normal}")
+        return auditor_sigstruct.mrenclave == dev_sigstruct.mrenclave
+
+    raise NotImplementedError
 
 
 def verify(

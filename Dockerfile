@@ -1,6 +1,6 @@
 FROM python:3
 
-COPY --from=initc3/linux-sgx:2.12-ubuntu18.04 /opt/sgxsdk/bin /opt/sgxsdk/bin
+COPY --from=initc3/linux-sgx:2.13-ubuntu20.04 /opt/sgxsdk/bin /opt/sgxsdk/bin
 
 RUN apt-get update && apt-get install -y \
                 vim \
