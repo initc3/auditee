@@ -17,12 +17,12 @@ ReportItem = namedtuple("ReportItem", ("matches", "expected", "computed"))
 
 
 def verify_mrenclave(
-    docker_build_attrs,
     signed_enclave,
     enclave_config,
     *,
     ias_report=None,
     unsigned_enclave_filename="Enclave.so",
+    docker_build_attrs,
 ):
     """Verifies if the MRENCLAVE of the provided signed enclave matches
     with the one obtained when rebuilding the enclave from source, and
