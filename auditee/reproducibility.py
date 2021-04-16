@@ -1,11 +1,15 @@
+import json
+import os
 import pathlib
 from collections import namedtuple
 
+import yaml
 from blessings import Terminal
 from colorama import init as init_colorama  # , Fore, Back, Style
 from python_on_whales import docker
 
 from auditee.sgx import Sigstruct, sign as sgx_sign
+from auditee.bindings.quote import read_sgx_quote_body_b64
 
 init_colorama()
 term = Terminal()
@@ -16,7 +20,103 @@ ReproducibilityReport = namedtuple(
 ReportItem = namedtuple("ReportItem", ("matches", "expected", "computed"))
 
 
+def print_report(dev_mrenclave, audit_mrenclave, *, ias_report_mrenclave=None):
+    print(f"\n{term.bold}Reproducibility Report\n----------------------{term.normal}")
+    print(
+        f"- Signed enclave NMRENCLAVE: "
+        f"\t\t\t{term.bold}{dev_mrenclave}{term.normal}"
+    )
+    print(
+        f"- Built-from-source enclave NMRENCLAVE: "
+        f"\t{term.bold}{audit_mrenclave}{term.normal}"
+    )
+    if ias_report_mrenclave:
+        print(
+            f"- IAS report NMRENCLAVE: "
+            f"\t\t\t{term.bold}{ias_report_mrenclave}{term.normal}"
+        )
+    print()
+
+
 def verify_mrenclave(
+    src, signed_enclave, *, ias_report=None, docker_build_progress=False
+):
+    """Given some source code, a signed enclave, and optionally, a remote attestation
+    verification report from Intel's attestation service (IAS), verify whether
+    the signed enclave binary can be reproduced from the given source code, and
+    whether the IAS report corresponds to the given signed enclave.
+    """
+    signed_enclave_path = pathlib.Path(signed_enclave).resolve()
+    if ias_report is not None:
+        ias_report = pathlib.Path(ias_report).resolve()
+    src_path = pathlib.Path(src).resolve()
+    enclavehub_file = src_path.joinpath(".enclavehub.yml")
+    with open(enclavehub_file) as f:
+        enclavehub_config = yaml.safe_load(f)
+
+    enclave_build_config = enclavehub_config["enclaves"][0]
+
+    build_config = enclave_build_config["build"]
+    builder = build_config["builder"]
+    if builder == "docker":
+        build_kwargs = build_config["build_kwargs"]
+        os.chdir(src_path)
+        docker.build(
+            output={"type": "local", "dest": "/tmp/out"},
+            progress=docker_build_progress,
+            **build_kwargs,
+        )
+
+    unsigned_enclave = pathlib.Path("/tmp/out").joinpath(build_config["enclave_file"])
+    signing_key = pathlib.Path(__file__).parent.resolve().joinpath("signing_key.pem")
+    dev_sigstruct = Sigstruct.from_enclave_file(signed_enclave_path)
+    rebuilt_signed_enclave = "/tmp/rebuilt_enclave.signed.so"
+    sgx_sign(
+        unsigned_enclave,
+        key=signing_key,
+        out=rebuilt_signed_enclave,
+        config=enclave_build_config["enclave_config"],
+    )
+    auditor_sigstruct = Sigstruct.from_enclave_file(rebuilt_signed_enclave)
+    if not ias_report:
+        print_report(dev_sigstruct.mrenclave.hex(), auditor_sigstruct.mrenclave.hex())
+        if auditor_sigstruct.mrenclave == dev_sigstruct.mrenclave:
+            print(f"{term.green}MRENCLAVE match!{term.normal}")
+        else:
+            print(f"{term.red}MRENCLAVE do not match!{term.normal}")
+        return auditor_sigstruct.mrenclave == dev_sigstruct.mrenclave
+
+    with open(ias_report) as f:
+        ias_report_data = json.load(f)
+
+    report_body = ias_report_data["body"]
+    # TODO verify certificate & signature -- see issue #5
+    # https://github.com/sbellem/auditee/issues/5
+    # report_headers = ias_report_data["headers"]
+    isv_enclave_quote_body = report_body["isvEnclaveQuoteBody"]
+    quote_body = read_sgx_quote_body_b64(isv_enclave_quote_body)
+    report_mrenclave = bytes(quote_body.report_body.mr_enclave.m)
+    print_report(
+        dev_sigstruct.mrenclave.hex(),
+        auditor_sigstruct.mrenclave.hex(),
+        ias_report_mrenclave=report_mrenclave.hex(),
+    )
+    mrenclave_match = (
+        auditor_sigstruct.mrenclave == dev_sigstruct.mrenclave == report_mrenclave
+    )
+    if mrenclave_match:
+        print(f"{term.green}MRENCLAVES match!{term.normal}")
+    else:
+        print(f"{term.red}MRENCLAVES do not match!{term.normal}")
+
+    print(f"\n{term.bold}Report data\n-----------{term.normal}")
+    report_data = bytes(quote_body.report_body.report_data.d).hex()
+    print(f"{report_data}")
+
+    return mrenclave_match
+
+
+def _verify_mrenclave(
     signed_enclave,
     enclave_config,
     *,
@@ -99,11 +199,11 @@ def verify(
     }
     report = ReproducibilityReport(**report_data)
     if verbose:
-        print_report(report, show_mrsigner=show_mrsigner)
+        _print_report(report, show_mrsigner=show_mrsigner)
     return report
 
 
-def print_report(report, show_mrsigner=False):
+def _print_report(report, show_mrsigner=False):
     print(f"\n{term.bold}Reproducibility Report\n----------------------")
     for attr, val in report._asdict().items():
         if attr == "mrsigner" and not show_mrsigner:
