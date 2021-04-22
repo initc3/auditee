@@ -85,3 +85,6 @@ sgx_status_t enclave_set_report_data(sgx_report_data_t *report_data) {
 >>> hashlib.sha256(b'Hello World!').hexdigest()
 '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069'
 ```
+
+**TODO**
+Explain how it works.

@@ -110,6 +110,15 @@ def verify_mrenclave(
         print(f"{term.red}MRENCLAVES do not match!{term.normal}")
 
     print(f"\n{term.bold}Report data\n-----------{term.normal}")
+    can_or_cannot = (
+        f"{term.bold_green}CAN{term.normal}"
+        if mrenclave_match
+        else f"{term.bold_red}CANNOT{term.normal}"
+    )
+    print(
+        f"The following {term.bold}REPORT DATA{term.normal} contained in "
+        f"the remote attestation verification report {can_or_cannot} be trusted."
+    )
     report_data = bytes(quote_body.report_body.report_data.d).hex()
     print(f"{report_data}")
 
