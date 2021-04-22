@@ -15,18 +15,28 @@ the source code used to build the given signed enclave, for which a remote attes
 report was verified by Intel's Attestation Service. It's important to note that Intel
 is a trusted party.
 
-Try the example in a python or ipython shell. If you have not done so already, clone
-the repository, with submodules, e.g.:
+To try the example, if you have not done so already, clone the repository,
+with submodules, e.g.:
 
 ```shell
 $ git clone --recurse-submodules https://github.com/sbellem/auditee.git
 ```
 
-Change directory to `examples/sgx-hash`:
+Work in a docker container using `docker-compose`:
 
 ```shell
-$ cd examples/sgx-hash
+$ docker-compose build auditee
 ```
+
+Start an ipython session in a container, under the `sgx-hash` example directory:
+
+```shell
+docker-compose run --rm --workdir /usr/src/examples/sgx-hash auditee ipython
+```
+
+Verify the "trustworthiness" of the REPORT DATA in a remote attestion report
+(`ias-report.json`) that claims to be for a signed enclave (`Enclave.signed.so`)
+and some source code (`sgx-quote-sample`):
 
 ```python
 import auditee
@@ -55,8 +65,8 @@ True
 ```
 
 Now, you can check the report data for yourself. It's supposed to be the SHA 256 of
-the string 'Hello World!'. You can inspect (audit) the [SGX enclave code](https://github.com/sbellem/sgx-quote-sample/blob/c950a0e1f89b346c3efb27d2cc41eb4327328adc/Enclave/Enclave.cpp#L140-L146) yourself to
-verify this:
+the string 'Hello World!'. You can inspect (audit) the
+[SGX enclave code](https://github.com/sbellem/sgx-quote-sample/blob/c950a0e1f89b346c3efb27d2cc41eb4327328adc/Enclave/Enclave.cpp#L140-L146) yourself to verify this:
 
 
 ```cpp
