@@ -13,6 +13,7 @@ auditee
 
     sgx
     demo
+    examples
     credits
 
 Prerequisites
