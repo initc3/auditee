@@ -1,3 +1,0 @@
-[submodule "examples/hashmachine/sgx-hashmachine"]
-	path = examples/hashmachine/sgx-hashmachine
-	url = https://github.com/sbellem/sgx-hashmachine.git
