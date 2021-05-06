@@ -49,8 +49,8 @@ field.
 .. can rely this ``REPORT_DATA``.
 
 
-sgx-hash
-^^^^^^^^
+sgx-hashmachine
+^^^^^^^^^^^^^^^
 Alice claims that the hexadecimal string
 
 .. code-block:: python
@@ -93,35 +93,33 @@ steps:
 
 STEP 1: Inspect the source code
 """""""""""""""""""""""""""""""
-Go into the directory ``examples/sgx-hash/sgx-quote-sample/Enclave`` and
+Go into the directory ``examples/hashmachine/sgx-hashmachine/Enclave`` and
 open the file ``Enclave.cpp`` ... check that the number of iterations is
 indeed 1 billion (1000000000) and that the initial string is "Hello World!".
 
 .. code-block:: cpp
 
-    sgx_status_t enclave_set_report_data(sgx_report_data_t *report_data) {
+    sgx_status_t get_report(sgx_report_t *report, sgx_target_info_t *target_info) {
+      sgx_report_data_t report_data = {{0}};
+
+      // Hardcoded "Hello World!" string in hexadecimal format
       const uint8_t x[] = {0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20,
                            0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21};
-      int iterations = 1000000000;
+      int iterations = 100000000;
       sgx_status_t sha_ret;
-      sgx_sha256_hash_t intermediate_hash;
-      sha_ret =
-          sgx_sha256_msg(x, sizeof(x), (sgx_sha256_hash_t *)intermediate_hash);
-    
+      sgx_sha256_hash_t tmp_hash;
+      sha_ret = sgx_sha256_msg(x, sizeof(x), (sgx_sha256_hash_t *)tmp_hash);
+
       for (int i = 1; i < iterations - 1; i++) {
-        sha_ret = sgx_sha256_msg((const uint8_t *)&intermediate_hash,
-                                 sizeof(intermediate_hash),
-                                 (sgx_sha256_hash_t *)intermediate_hash);
+        sha_ret = sgx_sha256_msg((const uint8_t *)&tmp_hash, sizeof(tmp_hash),
+                                 (sgx_sha256_hash_t *)tmp_hash);
       }
-    
-      sha_ret = sgx_sha256_msg((const uint8_t *)&intermediate_hash,
-                               sizeof(intermediate_hash),
-                               (sgx_sha256_hash_t *)report_data);
-      return sha_ret;
+
+      sha_ret = sgx_sha256_msg((const uint8_t *)&tmp_hash, sizeof(tmp_hash),
+                               (sgx_sha256_hash_t *)&report_data);
+
+      return sgx_create_report(target_info, &report_data, report);
     }
-
-
-
 
 In this example, the enclave code computes the hash (SHA 256) of the string
 ``"Hello World!"`` and puts the result in the ``REPORT_DATA`` of an attestation
@@ -134,7 +132,7 @@ the source code.
 
 STEP 2: MRENCLAVEs Comparison
 """""""""""""""""""""""""""""
-Under the directory ``examples/sgx-hash`` there's a file named
+Under the directory ``examples/hashmachine`` there's a file named
 ``ias-report.json``. This file contains a remote attestation verification
 report that was received from Intel's Attestation Service (IAS). The
 report contains the MRENCLAVE of the enclave that was attested and a
@@ -155,13 +153,13 @@ Go into the directory of the ``sgx-hash`` example:
 
 .. code-block:: console
 
-    root@f07e2606a418:/usr/src# cd examples/sgx-hash/
+    root@f07e2606a418:/usr/src# cd examples/hashmachine/
 
 Start an ipython session:
 
 .. code-block:: console
 
-    root@f07e2606a418:/usr/src/examples/sgx-hash# ipython
+    root@f07e2606a418:/usr/src/examples/hashmachine# ipython
 
 Use the :py:func:`auditee.verify_mrenclave()` function to verify that the
 ``MRENCLAVE`` from the enclave binary that built from source matches the

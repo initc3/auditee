@@ -2,3 +2,6 @@
 	path = examples/sgx-hash/sgx-quote-sample
 	url = https://github.com/sbellem/sgx-quote-sample.git
 	branch = enclavehub
+[submodule "examples/hashmachine/sgx-hashmachine"]
+	path = examples/hashmachine/sgx-hashmachine
+	url = https://github.com/sbellem/sgx-hashmachine.git
