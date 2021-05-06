@@ -51,8 +51,80 @@ field.
 
 sgx-hash
 ^^^^^^^^
+Alice claims that the hexadecimal string
+
+.. code-block:: python
+
+    b4930c4241d04a313d46452167274763f5a6437ca2c39ce2e2baa24079086e14
+
+is the result of having computed the SHA 256 hash a billion times, starting
+with the string ``"Hello World!"``, and repeatedly hashing the new result of
+each iteration. For instance, in Python:
+
+.. code-block:: python
+    
+    s = b'Hello World!'
+    for _ in range(1000000000):
+        s = sha256(s).digest()
+    return s
+
+You could perform the computation yourself, using the above code snippet, to
+verify the veracity of the claim. This may take 10 minutes or so. But let's
+say that for whatever reason you do not want or cannot perform the computation
+yourself. Could you be convinced in another way that the claim is true?
+
+The goal of this example is to show that, if you trust Intel, then you could
+indeed be convinced that the claim is true. That is, presented with a remote
+attestation verification report, which contains the result of the computation,
+we'll verify whether this report "matches" source code that does perform
+the billion-times hashing computation over "Hello World!".
+
+To convince yourself that the claim is true, we'll go through the following
+steps:
+
+1. Inspect the source code that performs the computation to confirm that it
+   indeed hashes a billion times, starting with the string "Hello World!".
+2. Verify that the ``MRENCLAVE`` of the remote attestation verification report
+   matches the ``MRENCLAVE`` from an enclave binary built from the above
+   source code.
+
+.. note:: The authenticity of the remote attestation verification report MUST
+    be verified to make sure the report does indeed come from Intel. 
+
+STEP 1: Inspect the source code
+"""""""""""""""""""""""""""""""
+Go into the directory ``examples/sgx-hash/sgx-quote-sample/Enclave`` and
+open the file ``Enclave.cpp`` ... check that the number of iterations is
+indeed 1 billion (1000000000) and that the initial string is "Hello World!".
+
+.. code-block:: cpp
+
+    sgx_status_t enclave_set_report_data(sgx_report_data_t *report_data) {
+      const uint8_t x[] = {0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20,
+                           0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21};
+      int iterations = 1000000000;
+      sgx_status_t sha_ret;
+      sgx_sha256_hash_t intermediate_hash;
+      sha_ret =
+          sgx_sha256_msg(x, sizeof(x), (sgx_sha256_hash_t *)intermediate_hash);
+    
+      for (int i = 1; i < iterations - 1; i++) {
+        sha_ret = sgx_sha256_msg((const uint8_t *)&intermediate_hash,
+                                 sizeof(intermediate_hash),
+                                 (sgx_sha256_hash_t *)intermediate_hash);
+      }
+    
+      sha_ret = sgx_sha256_msg((const uint8_t *)&intermediate_hash,
+                               sizeof(intermediate_hash),
+                               (sgx_sha256_hash_t *)report_data);
+      return sha_ret;
+    }
+
+
+
+
 In this example, the enclave code computes the hash (SHA 256) of the string
-`"Hello World!"` and puts the result in the ``REPORT_DATA`` of an attestation
+``"Hello World!"`` and puts the result in the ``REPORT_DATA`` of an attestation
 report that can be sent to Intel for verification. Roughly speaking,
 ``auditee`` can be used to build an enclave binary from some source code and
 check that its ``MRENCLAVE`` matches the one in the report. If the
@@ -60,44 +132,18 @@ check that its ``MRENCLAVE`` matches the one in the report. If the
 one can then trust that the ``REPORT_DATA`` was indeed generated according to
 the source code.
 
-
-.. todo:: hash machine
-
-.. code-block:: python
-
-    In [52]: def hashmachine(v=b'Hello World!', i=1000000):
-    ...:     now = time()
-    ...:     for _ in range(i):
-    ...:         x = sha256(v).digest()
-    ...:     then = time()
-    ...:     return x, then - now
-    ...: 
-    ...: 
-
-    In [53]: h = hashmachine
-    
-    In [54]: h()
-    Out[54]: 
-    (b'\x7f\x83\xb1e\x7f\xf1\xfcS\xb9-\xc1\x81H\xa1\xd6]\xfc-K\x1f\xa3\xd6w(J\xdd\xd2\x00\x12m\x90i',
-     0.6743361949920654)
-    
-    In [55]: h(i=10000000)
-    Out[55]: 
-    (b'\x7f\x83\xb1e\x7f\xf1\xfcS\xb9-\xc1\x81H\xa1\xd6]\xfc-K\x1f\xa3\xd6w(J\xdd\xd2\x00\x12m\x90i',
-     6.5437891483306885)
-    
-    In [56]: h(i=100000000)
-    Out[56]: 
-    (b'\x7f\x83\xb1e\x7f\xf1\xfcS\xb9-\xc1\x81H\xa1\xd6]\xfc-K\x1f\xa3\xd6w(J\xdd\xd2\x00\x12m\x90i',
-     68.60618114471436)
-    
-    In [57]: h(i=1000000000)
-    Out[57]: 
-    (b'\x7f\x83\xb1e\x7f\xf1\xfcS\xb9-\xc1\x81H\xa1\xd6]\xfc-K\x1f\xa3\xd6w(J\xdd\xd2\x00\x12m\x90i',
-     680.1195211410522)
-
-
-
+STEP 2: MRENCLAVEs Comparison
+"""""""""""""""""""""""""""""
+Under the directory ``examples/sgx-hash`` there's a file named
+``ias-report.json``. This file contains a remote attestation verification
+report that was received from Intel's Attestation Service (IAS). The
+report contains the MRENCLAVE of the enclave that was attested and a
+REPORT_DATA value. The REPORT_DATA contains the hash that we care about,
+meanwhile the MRENCLAVE should match that of an enclave binary built from the
+source code we inspected in step 1. To compare the two MRENCLAVEs we can use
+the ``auditee`` tool which automates the multiple steps required, such as
+building the enclave binary, extracting its MRENCLAVE, and parsing the report
+for its MRENCLAVE.
 
 From the root of the project, spin up a container:
 
@@ -117,14 +163,12 @@ Start an ipython session:
 
     root@f07e2606a418:/usr/src/examples/sgx-hash# ipython
 
-Now, for that sake of this example, imagine that someone ends you over some
-data
-We now want to verify that the ``REPORT_DATA``
-
-Use the :py:func:`verify_mrenclave` to verify the ``MRENCLAVE`` that a given signed enclave
-can be re-built from some source code, and that
-
-
+Use the :py:func:`auditee.verify_mrenclave()` function to verify that the
+``MRENCLAVE`` from the enclave binary that built from source matches the
+MRENCLAVE in the remote attestation report. Recall that the report confirms,
+as per Intel, that the enclave with the specified MRENCLAVE, is a genuine
+Intel SGX processor, which in turn, more or less confirms that the code that
+it executes has not been tampered with.
 
 .. code-block:: python
 
