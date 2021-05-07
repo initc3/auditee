@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   auditee:
+    image: auditee-local
     build:
       context: .
       dockerfile: Dockerfile
@@ -17,6 +18,7 @@ services:
       - ./tests:/usr/src/tests
       - /var/run/docker.sock:/var/run/docker.sock
   builddocs:
+    image: auditee-local
     build:
       context: .
       dockerfile: Dockerfile

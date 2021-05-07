@@ -1,6 +1,9 @@
-SGX Background
-==============
+Background
+==========
+.. note:: *Still in draft.*
+
 Some brief notes and pointers about Intel SGX.
+
 
 Measurement
 -----------
@@ -131,6 +134,66 @@ The signature is encrypted, and consequently cannot be verified without Intel.
     -- https://community.intel.com/t5/Intel-Software-Guard-Extensions/Verify-EPID-Signature/m-p/1085984#M706
 
 Also see https://github.com/kudelskisecurity/sgxfun/blob/master/GETQUOTE.md.
+
+
+To Trust or Not to Trust
+------------------------
+**How can one trust the output of an enclave?**
+
+Assuming one trusts the physical security of a chip, that known attacks have
+been mitigated, and that the enclave code is not vulnerable to side channel
+attacks, then how can one be certain that the output of an enclave is
+trustworthy? The short answer is:
+
+    **audits** + **reproducible builds** + **remote attestation**
+
+.. _audits:
+
+Audits
+^^^^^^
+Audits are necessary to verify that the enclave code does indeed what it is
+expected to do and that it meets specific security requirements. For instance,
+it may be possible through a security audit to verify that the enclave was
+implemented such that it is not vulnerable to certain side-channel attacks.
+See https://arxiv.org/abs/2006.13598.
+
+.. todo:: Provide references/citations.
+
+It's essential to make sure that the source code being audited is the exact
+code that was used to build the enclave (`Enclave.signed.so`) that is
+deployed. Hence, a signed enclave binary must be reproducible from its source
+code. The next section covers reproducible builds in the context of enclaves.
+
+.. _reproducible-builds:
+
+Reproducible builds
+^^^^^^^^^^^^^^^^^^^
+In the context of SGX enclaves, a reproducible build mainly
+means that the MRENCLAVE remains constant.
+
+.. _remote-attestation:
+
+Remote attestation
+^^^^^^^^^^^^^^^^^^
+The remote attestation report also
+contains the MRENCLAVE, and can therefore be checked against the source code,
+and the pre-built enclave under audit. In other words, given a remote
+attestation report, it's possible to verify that the report was generated
+by an enclave binary, and it's possible to verify that the enclave binary
+was built from a specific version of source code. Through this verification
+process a user can then gain trust in the ``REPORT_DATA`` contained in the
+remote attestation report. This ``REPORT_DATA`` can contain arbitrary data,
+according to the needs of the application.
+
+
+The auditee tool wishes to help a user of an application that relies on
+some output of an enclave wishes
+
+Current State & Motivation
+--------------------------
+
+Techincal Challenges
+^^^^^^^^^^^^^^^^^^^^
 
 
 

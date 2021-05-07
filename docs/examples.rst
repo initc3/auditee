@@ -1,27 +1,6 @@
 Examples
 ========
 This section presents examples which can be followed through to see how the
-``auditee`` tool can be used.
-
-For background information see the section `<background-examples>`.
-
-Prerequisites
--------------
-To follow through the examples as they are presented it's best that you have
-`<docker-compose>`_.
-
-Clone the repository, for instance:
-
-.. code-block:: shell
-
-    $ git clone --recursive https://github.com/sbellem/auditee.git
-
-
-.. _run-examples:
-
-Running the examples
---------------------
-This section presents examples which can be followed through to see how the
 ``auditee`` tool can be used. Each example contains the source code of an
 enclave application, which for the sake of demonstration could be seen as
 being under audit. One could imagine that an auditing party would inspect the
@@ -49,13 +28,29 @@ field.
 .. can rely this ``REPORT_DATA``.
 
 
-sgx-hashmachine
-^^^^^^^^^^^^^^^
-Alice claims that the hexadecimal string
+.. For background information see the section `<background-examples>`.
+
+Prerequisites
+-------------
+To follow through the examples as they are presented it's best that you have
+`<docker-compose>`_.
+
+Clone the repository, for instance:
+
+.. code-block:: shell
+
+    $ git clone --recursive https://github.com/sbellem/auditee.git
+
+
+.. _run-examples:
+
+SGX Hash Machine
+----------------
+Let's imagine Alice claims that the hexadecimal string
 
 .. code-block:: python
 
-    b4930c4241d04a313d46452167274763f5a6437ca2c39ce2e2baa24079086e14
+    fceb63059b60138e03a7d6edf6ccb1d942d9165c2812ba926b0fbb0c729eae97
 
 is the result of having computed the SHA 256 hash 100 million times, starting
 with the string ``"Hello World!"``, and repeatedly hashing the new result of
@@ -75,9 +70,12 @@ each iteration. For instance, in Python:
     print(f'computed value: {s}')
 
 You could perform the computation yourself, using the above code snippet, to
-verify the veracity of the claim. This may take 10 minutes or so. But let's
-say that for whatever reason you do not want or cannot perform the computation
-yourself. Could you be convinced in another way that the claim is true?
+verify the veracity of the claim. This may take a minute or so. But if the number
+of iterations was larger, say one trillion, it could take a couple of days ... What
+if the computation took a month, a year? So let's say that for whatever reason you do
+not want or cannot perform the computation yourself.
+
+Could you be convinced in another way that the claim is true?
 
 The goal of this example is to show that, if you trust Intel, then you could
 indeed be convinced that the claim is true. That is, presented with a remote
@@ -98,7 +96,7 @@ steps:
     be verified to make sure the report does indeed come from Intel. 
 
 STEP 1: Inspect the source code
-"""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Go into the directory ``examples/hashmachine/sgx-hashmachine/Enclave`` and
 open the file ``Enclave.cpp`` ... check that the number of iterations is
 indeed 100 million (100000000) and that the initial string is "Hello World!".
@@ -137,7 +135,7 @@ one can then trust that the ``REPORT_DATA`` was indeed generated according to
 the source code.
 
 STEP 2: MRENCLAVEs Comparison
-"""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Under the directory ``examples/hashmachine`` there's a file named
 ``ias-report.json``. This file contains a remote attestation verification
 report that was received from Intel's Attestation Service (IAS). The
@@ -184,69 +182,94 @@ it executes has not been tampered with.
         ias_report='ias-report.json',
     )
 
-.. image:: _static/sgx-hash-example.png
+.. code-block:: python
+
+    Reproducibility Report
+    ----------------------
+    - Signed enclave NMRENCLAVE:                    15e1be2fb364d081cf764c25ffd462e07827c75f45877bbcc441a9b3fb240d9c
+    - Built-from-source enclave NMRENCLAVE:         15e1be2fb364d081cf764c25ffd462e07827c75f45877bbcc441a9b3fb240d9c
+    - IAS report NMRENCLAVE:                        15e1be2fb364d081cf764c25ffd462e07827c75f45877bbcc441a9b3fb240d9c
+
+    MRENCLAVES match!
+
+    Report data
+    -----------
+    The following REPORT DATA contained in the remote attestation verification report CAN be trusted.
+    fceb63059b60138e03a7d6edf6ccb1d942d9165c2812ba926b0fbb0c729eae970000000000000000000000000000000000000000000000000000000000000000
+    >>> True
+
+.. figure:: _static/sgx-hashmachine-match.png
+
+
+**Example of MRENCLAVE mismatch:**
+
+.. code-block:: python
+
+    Reproducibility Report
+    ----------------------
+    - Signed enclave NMRENCLAVE:                    46eba17f7432c6939e58f7fd47130a8ec5ef87eb270bac0a641a5c66b36e6231
+    - Built-from-source enclave NMRENCLAVE:         43aba22d286f8daab8ef3c7c0791c85e67a2fdb3c0fd152905deac7b8dfa88f8
+    - IAS report NMRENCLAVE:                        46eba17f7432c6939e58f7fd47130a8ec5ef87eb270bac0a641a5c66b36e6231
+
+    MRENCLAVES do not match!
+
+    Report data
+    -----------
+    The following REPORT DATA contained in the remote attestation verification report CANNOT be trusted.
+    fceb63059b60138e03a7d6edf6ccb1d942d9165c2812ba926b0fbb0c729eae970000000000000000000000000000000000000000000000000000000000000000
+    >>> False
+
+.. image:: _static/sgx-hashmachine-failure.png
+
+
+Sending a Quote to Intel
+------------------------
+
+.. code-block:: python
+    
+    from hashlib import sha256
+
+    import requests
+
+    from auditee.bindings.quote import read_sgx_quote_body_b64
+
+    ias_url = "https://api.trustedservices.intel.com/sgx/dev"
+    verify_endpoint = "/attestation/v4/report"
+    url = ias_url + verify_endpoint
+    headers = {
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': 'your-subscription-key'
+    }
+    
+    quote = {
+        "isvEnclaveQuote":"AgAAAFsLAAALAAoAAAAAAFOrdeScwC/lZP1RWReIG+h/rVJejTZl/1GvCOdvcauJCRH//wECAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAHAAAAAAAAACY/GzrimHYXELYGCnKp2A+go2mzJCqHNDdOpdwBbe38AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9ccY4Dvd8VBfostHOLUtlBLn0GOUEk0JEDP/yRD2VvQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqAIAAGw7FkGhY+XgiLhY0eOe6K74pj8IX4OVDOa+GKEgtwAUtOsdiPih+XcJ3qRYp+h6anUunYRo3bUyjMMW4jtwCFHzKb9rnMEN/pUup4pPD8cv27f8kkafYux41x25sEkhknPurBTWDRA0QzXFXN03qBwsOflQUTJdaVcuj3QDR3lUFdpobDu253dqh5Fe1VocOsgkaugLOaXM0QMbdT+kz55QxXV+xIVNf9o6B6tb7gXpFlMgv5s48wdF6APxbMMgvXS7MalstAvDy0SvhVu9vle2ARhAqRsFPadB/UpvIs9yukWE9gZQn9ys0VSDjwnjsWn/2dia4k7Mys39Exoqe/5KEwHtaDEqlDOKZLgHufFujVeMRuhGUdXlegzaXf2u0YdpQoWBpdlv7iZ0uGgBAADqp5Gp2fZB5O8rUh/hEW1025QNzSIzOaqxxJkvo/Ptl3rW6A5ayroZU1cQ8p6ivimVTngImH2bKc/X+JTUceHUBS2Dyx8B2RE/M4dRgTAF5u5yfY6nTXi0Llt1Elz1DImLHaNN2DtFjhwDsX/H+y5rpZ0eIhm98zdg6kh3Yc+BJauGP0HHsNDUqgcu/NInxZS1r9XGwY6kq+x0L1k/n7igD2XRTMcMjN7EgP573O+nzTnHU/yQBKwyYxkNfkna8yR/NS8RsyjELJjqVaxZSavGoeT0O7V47Zdc1XPlJFqIa0Ba1HrA0RQWr1Hu5QoTwEIctwnR/Ua1ZGxqain+DwcNcMChWNLYC8nTt3KCky2tnLwOWVefCk5gIN9fwg3RQDFZTcM7En33lgP6P8NNbrzjJv7uq0RqErR8X+PV8l5pKfoWy99OupOswO8RHub/64y8Z2+2kFdYlZViSRgXZIAxN6XVPXk9D1BB/A7wQeH2pXxmsVq3slN3",
+        "nonce":"848c6566356c188bb48d0471e8a61164",
+    }
+    res = requests.post(url, json=quote, headers=headers)
+    res.json()
+    {'nonce': '848c6566356c188bb48d0471e8a61164',
+     'id': '150295377195425398821601045353791256967',
+     'timestamp': '2021-03-11T19:06:13.126888',
+     'version': 4,
+     'advisoryURL': 'https://security-center.intel.com',
+     'advisoryIDs': ['INTEL-SA-00161',
+      'INTEL-SA-00381',
+      'INTEL-SA-00389',
+      'INTEL-SA-00320',
+      'INTEL-SA-00329',
+      'INTEL-SA-00220',
+      'INTEL-SA-00270',
+      'INTEL-SA-00293'],
+     'isvEnclaveQuoteStatus': 'GROUP_OUT_OF_DATE',
+     'platformInfoBlob': '150200650400090000111102040101070000000000000000000B00000B000000020000000000000B5BC7CE9415DB41EBF2587D3F9158478191EBB5E4069D9DC5261B4EAE0E9F8B73B8FBF6DA587F0ED129D7301149D8B44109928A87FD011385CED0FF97A920590992',
+     'isvEnclaveQuoteBody': 'AgAAAFsLAAALAAoAAAAAAFOrdeScwC/lZP1RWReIG+h/rVJejTZl/1GvCOdvcauJCRH//wECAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAHAAAAAAAAACY/GzrimHYXELYGCnKp2A+go2mzJCqHNDdOpdwBbe38AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9ccY4Dvd8VBfostHOLUtlBLn0GOUEk0JEDP/yRD2VvQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
+    q_body = read_sgx_quote_body_b64(res.json()['isvEnclaveQuoteBody'])
+    bytes(q_body.report_body.report_data.d)[:32].hex() == sha256(b'Hello World!').hexdigest()
+    cert = x509.load_pem_x509_certificate(
+        urllib.parse.unquote(res.headers['X-IASReport-Signing-Certificate']).encode()
+    )
 
 
 
-.. _background-examples:
-
-Background
-----------
-**How can one trust the output of an enclave?**
-
-Assuming one trusts the physical security of a chip, that known attacks have
-been mitigated, and that the enclave code is not vulnerable to side channel
-attacks, then how can one be certain that the output of an enclave is
-trustworthy? The short answer is:
-
-    **audits** + **reproducible builds** + **remote attestation**
-
-.. _audits:
-
-Audits
-^^^^^^
-Audits are necessary to verify that the enclave code does indeed what it is
-expected to do and that it meets specific security requirements. For instance,
-it may be possible through a security audit to verify that the enclave was
-implemented such that it is not vulnerable to certain side-channel attacks.
-See https://arxiv.org/abs/2006.13598.
-
-.. todo:: Provide references/citations.
-
-It's essential to make sure that the source code being audited is the exact
-code that was used to build the enclave (`Enclave.signed.so`) that is
-deployed. Hence, a signed enclave binary must be reproducible from its source
-code. The next section covers reproducible builds in the context of enclaves.
-
-.. _reproducible-builds:
-
-Reproducible builds
-^^^^^^^^^^^^^^^^^^^
-In the context of SGX enclaves, a reproducible build mainly
-means that the MRENCLAVE remains constant.
-
-.. _remote-attestation:
-
-Remote attestation
-^^^^^^^^^^^^^^^^^^
-The remote attestation report also
-contains the MRENCLAVE, and can therefore be checked against the source code,
-and the pre-built enclave under audit. In other words, given a remote
-attestation report, it's possible to verify that the report was generated
-by an enclave binary, and it's possible to verify that the enclave binary
-was built from a specific version of source code. Through this verification
-process a user can then gain trust in the ``REPORT_DATA`` contained in the
-remote attestation report. This ``REPORT_DATA`` can contain arbitrary data,
-according to the needs of the application.
-
-
-The auditee tool wishes to help a user of an application that relies on
-some output of an enclave wishes
-
-Current State & Motivation
---------------------------
-
-Techincal Challenges
-^^^^^^^^^^^^^^^^^^^^
 
 .. _docker-compose: https://docs.docker.com/compose/install/
