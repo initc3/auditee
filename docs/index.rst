@@ -8,6 +8,10 @@ auditee
 
 **WORK IN PROGRESS** -- **Don't trust!**
 
+``auditee`` is a tool to help verifying the reproducibility of Intel SGX
+enclave builds. This can be helpful to assess if a given signed enclave build
+and/or remote attestation report correspond to some source code.
+
 .. toctree::
     :maxdepth: 1
 
