@@ -39,7 +39,7 @@ Clone the repository, for instance:
 
 .. code-block:: shell
 
-    $ git clone --recursive https://github.com/sbellem/auditee.git
+    $ git clone --recurse-submodules https://github.com/sbellem/auditee.git
 
 
 .. _run-examples:
