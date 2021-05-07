@@ -31,12 +31,13 @@ See the example documented under :ref:`sgx-hashmachine`.
 
 
 
-.. .. toctree::
-..     :maxdepth: 1
-..
-..     examples
-..     background
-..     credits
+.. toctree::
+    :maxdepth: 1
+    :hidden:
+
+    examples
+    background
+    credits
 
 .. Prerequisites
 .. -------------
