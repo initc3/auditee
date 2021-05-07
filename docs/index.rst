@@ -12,6 +12,9 @@ auditee
 enclave builds. This can be helpful to assess if a given signed enclave build
 and/or remote attestation report correspond to some source code.
 
+Although currently focused on Intel SGX, some concepts may be applicable to
+other TEEs.
+
 .. toctree::
     :maxdepth: 1
 
