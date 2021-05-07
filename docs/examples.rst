@@ -33,16 +33,16 @@ field.
 Prerequisites
 -------------
 To follow through the examples as they are presented it's best that you have
-`<docker-compose>`_.
+recent versions of `docker`_ and `<docker-compose>`_.
 
-Clone the repository, for instance:
+Clone the repository:
 
 .. code-block:: shell
 
     $ git clone --recurse-submodules https://github.com/sbellem/auditee.git
 
 
-.. _run-examples:
+.. _sgx-hashmachine:
 
 SGX Hash Machine
 ----------------
@@ -70,10 +70,10 @@ each iteration. For instance, in Python:
     print(f'computed value: {s}')
 
 You could perform the computation yourself, using the above code snippet, to
-verify the veracity of the claim. This may take a minute or so. But if the number
-of iterations was larger, say one trillion, it could take a couple of days ... What
-if the computation took a month, a year? So let's say that for whatever reason you do
-not want or cannot perform the computation yourself.
+verify the claim. This may take a minute or so. But if the number
+of iterations was larger, say one trillion, it could take a couple of days ...
+What if the computation took a month, a year? So let's say that for whatever
+reason you do not want or cannot perform the computation yourself.
 
 Could you be convinced in another way that the claim is true?
 
@@ -87,13 +87,15 @@ To convince yourself that the claim is true, we'll go through the following
 steps:
 
 1. Inspect the source code that performs the computation to confirm that it
-   indeed hashes a 100 million times, starting with the string "Hello World!".
+   indeed hashes 100 million times, starting with the string "Hello World!".
 2. Verify that the ``MRENCLAVE`` of the remote attestation verification report
    matches the ``MRENCLAVE`` from an enclave binary built from the above
    source code.
 
 .. note:: The authenticity of the remote attestation verification report MUST
     be verified to make sure the report does indeed come from Intel. 
+
+.. _step1:
 
 STEP 1: Inspect the source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -125,27 +127,28 @@ indeed 100 million (100000000) and that the initial string is "Hello World!".
       return sgx_create_report(target_info, &report_data, report);
     }
 
-In this example, the enclave code computes the hash (SHA 256) of the string
-``"Hello World!"`` and puts the result in the ``REPORT_DATA`` of an attestation
-report that can be sent to Intel for verification. Roughly speaking,
-``auditee`` can be used to build an enclave binary from some source code and
-check that its ``MRENCLAVE`` matches the one in the report. If the
-``MRENCLAVE`` of the built-from-source enclave matches the one of the report,
-one can then trust that the ``REPORT_DATA`` was indeed generated according to
-the source code.
+In this example, the enclave code computes the hash (SHA 256) 100 million
+times, starting with the string ``"Hello World!"`` and puts the result in the
+``REPORT_DATA`` of a quote (attestation report) that can be sent to Intel for
+verification. The function :cpp:func:`get_report()` is an ECALL that can be
+invoked by untrusted code. The important thing to note is that if the enclave
+works as it should, the untrusted part of the system cannot modify the code
+of :cpp:func:`get_report()` when it's executed. Remote attestation can
+provide a proof that the above :cpp:func:`get_report()` code was indeed
+executed on a genuine SGX-enabled CPU.
 
 STEP 2: MRENCLAVEs Comparison
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Under the directory ``examples/hashmachine`` there's a file named
 ``ias-report.json``. This file contains a remote attestation verification
 report that was received from Intel's Attestation Service (IAS). The
-report contains the MRENCLAVE of the enclave that was attested and a
-REPORT_DATA value. The REPORT_DATA contains the hash that we care about,
-meanwhile the MRENCLAVE should match that of an enclave binary built from the
-source code we inspected in step 1. To compare the two MRENCLAVEs we can use
-the ``auditee`` tool which automates the multiple steps required, such as
-building the enclave binary, extracting its MRENCLAVE, and parsing the report
-for its MRENCLAVE.
+report contains the ``MRENCLAVE`` of the enclave that was attested and a
+``REPORT_DATA`` value. The ``REPORT_DATA`` contains the hash that we care
+about, meanwhile the ``MRENCLAVE`` should match that of an enclave binary
+built from the source code we inspected in :ref:`step1`_. To compare the two
+``MRENCLAVEs`` we can use the ``auditee`` tool which automates the multiple
+steps required, such as building the enclave binary, extracting its
+``MRENCLAVE``, and parsing the report for its ``MRENCLAVE``.
 
 From the root of the project, spin up a container:
 
@@ -166,11 +169,12 @@ Start an ipython session:
     root@f07e2606a418:/usr/src/examples/hashmachine# ipython
 
 Use the :py:func:`auditee.verify_mrenclave()` function to verify that the
-``MRENCLAVE`` from the enclave binary that built from source matches the
-MRENCLAVE in the remote attestation report. Recall that the report confirms,
-as per Intel, that the enclave with the specified MRENCLAVE, is a genuine
-Intel SGX processor, which in turn, more or less confirms that the code that
-it executes has not been tampered with.
+``MRENCLAVE`` from the enclave binary that was built from source matches the
+``MRENCLAVE`` in the remote attestation report. Recall that the report
+confirms, as per Intel, that the code with the specified ``MRENCLAVE``, was
+loaded into a protected area of memory of a genuine Intel SGX processor, which
+in turn, more or less confirms that the code that it executes has not been
+tampered with.
 
 .. code-block:: python
 
@@ -270,6 +274,5 @@ Sending a Quote to Intel
     )
 
 
-
-
+.. _docker: https://docs.docker.com/get-docker/
 .. _docker-compose: https://docs.docker.com/compose/install/

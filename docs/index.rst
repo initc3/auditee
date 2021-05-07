@@ -5,7 +5,6 @@
 
 auditee
 =======
-
 **WORK IN PROGRESS** -- **Don't trust!**
 
 ``auditee`` is a tool to help verifying the reproducibility of Intel SGX
@@ -13,14 +12,31 @@ enclave builds. This can be helpful to assess if a given signed enclave build
 and/or remote attestation report correspond to some source code.
 
 Although currently focused on Intel SGX, some concepts may be applicable to
-other TEEs.
+other trusted execution environments (TEEs).
 
-.. toctree::
-    :maxdepth: 1
+Installation
+------------
+For now, the easiest to try ``auditee`` is to clone its GitHub repository:
 
-    examples
-    background
-    credits
+.. code-block:: shell
+
+    $ git clone --recurse-submodules https://github.com/sbellem/auditee.git
+
+Note the ``--recurse-submodules`` option to initialize the git submodules
+used in the examples.
+
+Usage
+-----
+See the example documented under :ref:`sgx-hashmachine`.
+
+
+
+.. .. toctree::
+..     :maxdepth: 1
+..
+..     examples
+..     background
+..     credits
 
 .. Prerequisites
 .. -------------
@@ -96,12 +112,12 @@ other TEEs.
 
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. Indices and tables
+.. ==================
+.. 
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`
 
 
 .. _sgxsign: https://github.com/intel/linux-sgx/tree/master/sdk/sign_tool/SignTool
