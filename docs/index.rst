@@ -16,7 +16,7 @@ other trusted execution environments (TEEs).
 
 Installation
 ------------
-For now, the easiest to try ``auditee`` is to clone its GitHub repository:
+Clone the GitHub repository:
 
 .. code-block:: shell
 
