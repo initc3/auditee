@@ -190,9 +190,9 @@ tampered with.
 
     Reproducibility Report
     ----------------------
-    - Signed enclave NMRENCLAVE:                    15e1be2fb364d081cf764c25ffd462e07827c75f45877bbcc441a9b3fb240d9c
-    - Built-from-source enclave NMRENCLAVE:         15e1be2fb364d081cf764c25ffd462e07827c75f45877bbcc441a9b3fb240d9c
-    - IAS report NMRENCLAVE:                        15e1be2fb364d081cf764c25ffd462e07827c75f45877bbcc441a9b3fb240d9c
+    - Signed enclave MRENCLAVE:                    15e1be2fb364d081cf764c25ffd462e07827c75f45877bbcc441a9b3fb240d9c
+    - Built-from-source enclave MRENCLAVE:         15e1be2fb364d081cf764c25ffd462e07827c75f45877bbcc441a9b3fb240d9c
+    - IAS report MRENCLAVE:                        15e1be2fb364d081cf764c25ffd462e07827c75f45877bbcc441a9b3fb240d9c
 
     MRENCLAVES match!
 
@@ -211,9 +211,9 @@ tampered with.
 
     Reproducibility Report
     ----------------------
-    - Signed enclave NMRENCLAVE:                    46eba17f7432c6939e58f7fd47130a8ec5ef87eb270bac0a641a5c66b36e6231
-    - Built-from-source enclave NMRENCLAVE:         43aba22d286f8daab8ef3c7c0791c85e67a2fdb3c0fd152905deac7b8dfa88f8
-    - IAS report NMRENCLAVE:                        46eba17f7432c6939e58f7fd47130a8ec5ef87eb270bac0a641a5c66b36e6231
+    - Signed enclave MRENCLAVE:                    46eba17f7432c6939e58f7fd47130a8ec5ef87eb270bac0a641a5c66b36e6231
+    - Built-from-source enclave MRENCLAVE:         43aba22d286f8daab8ef3c7c0791c85e67a2fdb3c0fd152905deac7b8dfa88f8
+    - IAS report MRENCLAVE:                        46eba17f7432c6939e58f7fd47130a8ec5ef87eb270bac0a641a5c66b36e6231
 
     MRENCLAVES do not match!
 

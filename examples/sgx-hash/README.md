@@ -51,9 +51,9 @@ This should output something similar to the following at the end:
 
 Reproducibility Report
 ----------------------
-- Signed enclave NMRENCLAVE:                    901c3b2c92fd8c08654bae68d858f59c81a6121f81e8998cbf9daf236e2ead74
-- Built-from-source enclave NMRENCLAVE:         901c3b2c92fd8c08654bae68d858f59c81a6121f81e8998cbf9daf236e2ead74
-- IAS report NMRENCLAVE:                        901c3b2c92fd8c08654bae68d858f59c81a6121f81e8998cbf9daf236e2ead74
+- Signed enclave MRENCLAVE:                    901c3b2c92fd8c08654bae68d858f59c81a6121f81e8998cbf9daf236e2ead74
+- Built-from-source enclave MRENCLAVE:         901c3b2c92fd8c08654bae68d858f59c81a6121f81e8998cbf9daf236e2ead74
+- IAS report MRENCLAVE:                        901c3b2c92fd8c08654bae68d858f59c81a6121f81e8998cbf9daf236e2ead74
 
 MRENCLAVES match!
 

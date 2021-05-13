@@ -22,17 +22,14 @@ ReportItem = namedtuple("ReportItem", ("matches", "expected", "computed"))
 
 def print_report(dev_mrenclave, audit_mrenclave, *, ias_report_mrenclave=None):
     print(f"\n{term.bold}Reproducibility Report\n----------------------{term.normal}")
+    print(f"- Signed enclave MRENCLAVE: \t\t\t{term.bold}{dev_mrenclave}{term.normal}")
     print(
-        f"- Signed enclave NMRENCLAVE: "
-        f"\t\t\t{term.bold}{dev_mrenclave}{term.normal}"
-    )
-    print(
-        f"- Built-from-source enclave NMRENCLAVE: "
+        f"- Built-from-source enclave MRENCLAVE: "
         f"\t{term.bold}{audit_mrenclave}{term.normal}"
     )
     if ias_report_mrenclave:
         print(
-            f"- IAS report NMRENCLAVE: "
+            f"- IAS report MRENCLAVE: "
             f"\t\t\t{term.bold}{ias_report_mrenclave}{term.normal}"
         )
     print()
@@ -155,10 +152,10 @@ def _verify_mrenclave(
     auditor_sigstruct = Sigstruct.from_enclave_file(out)
     if not ias_report:
         print(
-            f"\nsigned enclave NMRENCLAVE: \t\t{term.bold}{dev_sigstruct.mrenclave.hex()}{term.normal}"
+            f"\nsigned enclave MRENCLAVE: \t\t{term.bold}{dev_sigstruct.mrenclave.hex()}{term.normal}"
         )
         print(
-            f"built-from-source enclave NMRENCLAVE: \t{term.bold}{auditor_sigstruct.mrenclave.hex()}{term.normal}\n"
+            f"built-from-source enclave MRENCLAVE: \t{term.bold}{auditor_sigstruct.mrenclave.hex()}{term.normal}\n"
         )
         if auditor_sigstruct.mrenclave == dev_sigstruct.mrenclave:
             print(f"{term.green}MRENCLAVE match!{term.normal}")
