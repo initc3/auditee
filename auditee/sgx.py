@@ -77,7 +77,7 @@ Run "sgx_sign -version" to output version information and exit.
     if ignore_init_sec_error:
         popenargs.append("-ignore-init-sec-error")
 
-    subprocess.run(popenargs)
+    return subprocess.run(popenargs).returncode
 
 
 """Dump metadata information for a signed enclave file"""
@@ -114,7 +114,9 @@ def sign(enclave, *, key, out, config):
             -out bin/audit.enclave.signed.so \
             -config enclave/Enclave.config.xml
     """
-    _sign(enclave=enclave, key=key, out=out, config=config)
+    returncode = _sign(enclave=enclave, key=key, out=out, config=config)
+    if returncode != 0:
+        raise Exception("sgx_sign failed")
     # FIXME handle errors in the above call, rather than proceeding forward despite
     # errors -- for instance, errors in signing can result in no file being written
     # to 'out' thus causing the following open() instruction to fail.
