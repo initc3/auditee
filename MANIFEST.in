@@ -1,1 +1,2 @@
 include auditee/bindings/*.h
+include auditee/signing_key.pem
