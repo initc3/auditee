@@ -116,7 +116,9 @@ def sign(enclave, *, key, out, config):
     """
     returncode = _sign(enclave=enclave, key=key, out=out, config=config)
     if returncode != 0:
-        raise Exception("sgx_sign failed")
+        raise Exception(
+            f"sgx_sign failed for enclave file: {enclave}, key: {key}, out: {out}, config: {config}"
+        )
     # FIXME handle errors in the above call, rather than proceeding forward despite
     # errors -- for instance, errors in signing can result in no file being written
     # to 'out' thus causing the following open() instruction to fail.
