@@ -53,6 +53,9 @@ def verify_mrenclave(
 
     enclave_build_config = enclavehub_config["enclaves"][0]
 
+    # Get absolute path of enclave config
+    enclave_config = src_path.joinpath(enclave_build_config["enclave_config"])
+
     build_config = enclave_build_config["build"]
     builder = build_config["builder"]
     if builder == "docker":
@@ -72,7 +75,7 @@ def verify_mrenclave(
         unsigned_enclave,
         key=signing_key,
         out=rebuilt_signed_enclave,
-        config=enclave_build_config["enclave_config"],
+        config=enclave_config,
     )
     auditor_sigstruct = Sigstruct.from_enclave_file(rebuilt_signed_enclave)
     if not ias_report:
