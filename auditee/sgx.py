@@ -114,6 +114,7 @@ def sign(enclave, *, key, out, config):
             -out bin/audit.enclave.signed.so \
             -config enclave/Enclave.config.xml
     """
+    # FIXME if the returncode is not zero, try getting more informaton about the error
     returncode = _sign(enclave=enclave, key=key, out=out, config=config)
     if returncode != 0:
         raise Exception(
