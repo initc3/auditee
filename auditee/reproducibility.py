@@ -25,7 +25,7 @@ def print_report(dev_mrenclave, audit_mrenclave, *, ias_report_mrenclave=None):
     print(f"- Signed enclave MRENCLAVE: \t\t\t{term.bold}{dev_mrenclave}{term.normal}")
     print(
         f"- Built-from-source enclave MRENCLAVE: "
-        f"\t{term.bold}{audit_mrenclave}{term.normal}"
+        f"\t\t{term.bold}{audit_mrenclave}{term.normal}"
     )
     if ias_report_mrenclave:
         print(
@@ -158,7 +158,7 @@ def _verify_mrenclave(
             f"\nsigned enclave MRENCLAVE: \t\t{term.bold}{dev_sigstruct.mrenclave.hex()}{term.normal}"
         )
         print(
-            f"built-from-source enclave MRENCLAVE: \t{term.bold}{auditor_sigstruct.mrenclave.hex()}{term.normal}\n"
+            f"built-from-source enclave MRENCLAVE: \t\t{term.bold}{auditor_sigstruct.mrenclave.hex()}{term.normal}\n"
         )
         if auditor_sigstruct.mrenclave == dev_sigstruct.mrenclave:
             print(f"{term.green}MRENCLAVE match!{term.normal}")
