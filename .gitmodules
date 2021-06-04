@@ -2,5 +2,5 @@
 	path = examples/hashmachine/sgx-hashmachine
 	url = https://github.com/sbellem/sgx-hashmachine.git
 [submodule "sgx-iot"]
-	path = examples/iot/sgx-iot
+	path = examples/iot-gateway/sgx-iot
 	url = git@github.com:sbellem/sgx-iot.git
