@@ -234,6 +234,7 @@ Remote Attestation Report
 If you wonder how to get the remote attestation report, consult
 https://github.com/sbellem/sgx-hashmachine#quickstart.
 
+.. _sgx-iot-gateway:
 
 SGX IoT Gateway
 ---------------

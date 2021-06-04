@@ -27,7 +27,7 @@ used in the examples.
 
 Usage
 -----
-See the example documented under :ref:`sgx-hashmachine`.
+See the examples documented under :ref:`sgx-hashmachine` and :ref:`sgx-iot-gateway`.
 
 
 
