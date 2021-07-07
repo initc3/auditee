@@ -36,8 +36,8 @@ See the examples documented under :ref:`sgx-hashmachine` and :ref:`sgx-iot-gatew
 
     examples
     background
-    ack
     refs
+    ack
 
 .. Prerequisites
 .. -------------

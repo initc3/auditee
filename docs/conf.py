@@ -5,7 +5,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 project = "auditee"
-copyright = "2021, Sylvain Bellemare"
+copyright = "2021, Sylvain Bellemare, IC3 & Cornell University"
 author = "Sylvain Bellemare"
 
 release = "0.0.1.dev0"
