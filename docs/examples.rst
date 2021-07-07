@@ -1,9 +1,5 @@
 Examples
 ========
-
-.. contents::
-    :depth: 2
-
 This section presents examples which can be followed through to see how the
 ``auditee`` tool can be used. Each example contains the source code of an
 enclave application, which for the sake of demonstration could be seen as
@@ -96,7 +92,7 @@ steps:
    matches the ``MRENCLAVE`` from an enclave binary built from the above
    source code.
 
-.. note:: The authenticity of the remote attestation verification report MUST
+.. todo:: The authenticity of the remote attestation verification report MUST
     be verified to make sure the report does indeed come from Intel. 
 
 .. _step1:
@@ -273,9 +269,9 @@ the key pair in an enclave and sealing the private key, and storing it on disk. 
 In step 2 above, how can one be certain that the correct public key is uploaded to the
 cloud?
 
-**In this modified example, remote attestation is used to prove that the enclave is
-genuine and moreover to prove that the public key comes from the an enclave that was
-built from a trusted source code.**
+.. note:: In this modified example, remote attestation is used to prove that the enclave
+    is genuine and moreover to prove that the public key comes from the an enclave that
+    was built from a trusted source code.
 
 .. ---
 .. 

@@ -30,14 +30,18 @@ Usage
 See the examples documented under :ref:`sgx-hashmachine` and :ref:`sgx-iot-gateway`.
 
 
-
 .. toctree::
     :maxdepth: 1
     :hidden:
 
     examples
+    config
+    tool
     background
-    credits
+    relatedwork
+    glossary
+    refs
+    ack
 
 .. Prerequisites
 .. -------------

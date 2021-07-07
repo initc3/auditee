@@ -1,0 +1,112 @@
+@misc{cryptoeprint:2016:086,
+    author = {Victor Costan and Srinivas Devadas},
+    title = {Intel SGX Explained},
+    howpublished = {Cryptology ePrint Archive, Report 2016/086},
+    year = {2016},
+    note = {\url{https://eprint.iacr.org/2016/086}},
+}
+
+@phdthesis{fhe,
+    author = {Craig Gentry},
+    title = {A fully homomorphic encryption scheme},
+    school = {Stanford University},
+    year = 2009,
+    note = {\url{crypto.stanford.edu/craig}}
+}
+
+@inproceedings{10.1145/2046660.2046682,
+    author = {Naehrig, Michael and Lauter, Kristin and Vaikuntanathan, Vinod},
+    title = {Can Homomorphic Encryption Be Practical?},
+    year = {2011},
+    isbn = {9781450310048},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/2046660.2046682},
+    doi = {10.1145/2046660.2046682},
+    abstract = {The prospect of outsourcing an increasing amount of data storage and management to
+    cloud services raises many new privacy concerns for individuals and businesses alike.
+    The privacy concerns can be satisfactorily addressed if users encrypt the data they
+    send to the cloud. If the encryption scheme is homomorphic, the cloud can still perform
+    meaningful computations on the data, even though it is encrypted.In fact, we now know
+    a number of constructions of fully homomorphic encryption schemes that allow arbitrary
+    computation on encrypted data. In the last two years, solutions for fully homomorphic
+    encryption have been proposed and improved upon, but it is hard to ignore the elephant
+    in the room, namely efficiency -- can homomorphic encryption ever be efficient enough
+    to be practical? Certainly, it seems that all known fully homomorphic encryption schemes
+    have a long way to go before they can be used in practice. Given this state of affairs,
+    our contribution is two-fold.First, we exhibit a number of real-world applications,
+    in the medical, financial, and the advertising domains, which require only that the
+    encryption scheme is "somewhat" homomorphic. Somewhat homomorphic encryption schemes,
+    which support a limited number of homomorphic operations, can be much faster, and
+    more compact than fully homomorphic encryption schemes.Secondly, we show a proof-of-concept
+    implementation of the recent somewhat homomorphic encryption scheme of Brakerski and
+    Vaikuntanathan, whose security relies on the "ring learning with errors" (Ring LWE)
+    problem. The scheme is very efficient, and has reasonably short ciphertexts. Our unoptimized
+    implementation in magma enjoys comparable efficiency to even optimized pairing-based
+    schemes with the same level of security and homomorphic capacity. We also show a number
+    of application-specific optimizations to the encryption scheme, most notably the ability
+    to convert between different message encodings in a ciphertext.},
+    booktitle = {Proceedings of the 3rd ACM Workshop on Cloud Computing Security Workshop},
+    pages = {113–124},
+    numpages = {12},
+    keywords = {magma, fully homomorphic encryption, ring learning with errors, lattices},
+    location = {Chicago, Illinois, USA},
+    series = {CCSW '11}
+}
+
+# 10.1145/3319535.3354220
+@inproceedings{opera,
+author = {Chen, Guoxing and Zhang, Yinqian and Lai, Ten-Hwang},
+title = {OPERA: Open Remote Attestation for Intel's Secure Enclaves},
+year = {2019},
+isbn = {9781450367479},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3319535.3354220},
+doi = {10.1145/3319535.3354220},
+abstract = {Intel Software Guard Extensions (SGX) remote attestation enables enclaves to authenticate
+hardware inside which they run, and attest the integrity of their enclave memory to
+the remote party. To enforce direct control of attestation, Intel mandates attestation
+to be verified by Intel's attestation service. This Intel-centric attestation model,
+however, neither protects privacy nor performs efficiently when distributed and frequent
+attestation is required. This paper presents OPERA, an Open Platform for Enclave Remote
+Attestation. Without involving Intel's attestation service while conducting attestation,
+OPERA is unchained from Intel, although it relies on Intel to establish a chain of
+trust whose anchor point is the secret rooted in SGX hardware. OPERA is open, as the
+implementation of its attestation service is completely open, allowing any enclave
+developer to run her own OPERA service, and its execution is publicly verifiable and
+hence trustworthy; OPERA is privacy-preserving, as the attestation service does not
+learn which enclave is being attested or when the attestation takes place; OPERA is
+performant, as it does not rely on a single-point-of-verification and also reduces
+the latency of verification.},
+booktitle = {Proceedings of the 2019 ACM SIGSAC Conference on Computer and Communications Security},
+pages = {2317–2331},
+numpages = {15},
+keywords = {privacy-preserving techniques, Intel SGX, trusted execution environments, remote attestation},
+location = {London, United Kingdom},
+series = {CCS '19}
+}
+
+# DBLP:journals/corr/abs-2004-02020
+@article{decent,
+  author    = {Haofan Zheng and
+               Owen Arden},
+  title     = {Building secure distributed applications the {DECENT} way},
+  journal   = {CoRR},
+  volume    = {abs/2004.02020},
+  year      = {2020},
+  url       = {https://arxiv.org/abs/2004.02020},
+  archivePrefix = {arXiv},
+  eprint    = {2004.02020},
+  timestamp = {Wed, 08 Apr 2020 17:08:25 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-2004-02020.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{scarlata2018supporting,
+  title={Supporting third party attestation for Intel SGX with Intel data center attestation primitives},
+  author={Scarlata, Vinnie and Johnson, Simon and Beaney, James and Zmijewski, Piotr},
+  journal={White paper},
+  year={2018},
+  publisher={Intel Corporation}
+}

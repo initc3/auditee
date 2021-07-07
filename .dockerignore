@@ -1,0 +1,7 @@
+Dockerfile
+docker-compose.yml
+*~
+docs/_build
+*/__pycache__
+*.pyc
+*.egg-info
