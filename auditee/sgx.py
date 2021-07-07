@@ -2,12 +2,26 @@
 import itertools
 import functools
 import os
+import pathlib
 import struct
 import subprocess
 from hashlib import sha256
 
+from .errors import SGXSignError
 
-SGX_SIGN_CMD = os.environ.get("SGX_SIGN_CMD", "/opt/sgxsdk/bin/x64/sgx_sign")
+
+SGX_SDK = os.environ.get("SGX_SDK", "/opt/sgxsdk")
+"""str: Directory where the Linux SGX SDK is installed.
+
+It can be set via the environment variable ``SGX_SDK``.
+Defaults to :file:`/opt/sgxsdk`.
+"""
+
+SGX_SIGN_CMD = str(pathlib.Path(SGX_SDK).joinpath("bin/x64/sgx_sign"))
+"""str: Location of the ``sgx_sign`` tool.
+
+Defaults to :file:`/opt/sgxsdk/bin/x64/sgx_sign`.
+"""
 
 
 def _sgx_sign(
@@ -101,23 +115,56 @@ def dump_enclave_sigstruct(enclave, cssfile):
 
 def sign(enclave, *, key, out, config):
     """
-    Sign the enclave with the auditor key:
+    Sign the given enclave with the given key.
 
-    Wrapper for:
+    This function invokes the Linux SGX SDK ``sgx_sign`` tool, using
+    Python's :py:mod:`subprocess` module.
+
+    .. attention:: The SGX SDK must be installed on the system where
+        this function is invoked.
+
+        The path to the ``sgx_sign`` tool can be set via the
+        environment variable :attr:`~.SGX_SDK`. It defaults to
+        :file:`/opt/sgxsdk/bin/x64/sgx_sign`.
+
+    Parameters
+    ----------
+    enclave: str
+        Local file path to the unsigned enclave binary.
+    key: str
+        Local file path to a signing key with which to sign the enclave.
+    out: str
+        Local file path where the signed enclave should be written to.
+    config: str
+        Local file path to the enclave configuration file.
+
+    Raises
+    ------
+    :py:exc:`~.errors.SGXSignError`:
+        If something wrong happen when invoking the ``sgx_sign`` tool.
+
+    Returns
+    -------
+    bytes:
+        Signed enclave bytes.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        from auditee import sgx
+        sgx.sign('enclv.so', key='key.pem', out='enclv.sig.so', config='config.xml')
+
+    The above is equivalent to invoking the ``sgx_sign`` tool in a shell:
 
     .. code-block:: shell
 
-        $sgxsdk/sgxsdk/bin/x64/sgx_sign \
-            sign \
-            -key /usr/src/keys/Auditor_private.pem \
-            -enclave enclave/enclave.so \
-            -out bin/audit.enclave.signed.so \
-            -config enclave/Enclave.config.xml
+        $ sgx_sign sign -enclave enclv.so -key key.pem -out enclv.sig.so -config config.xml
     """
     # FIXME if the returncode is not zero, try getting more informaton about the error
     returncode = _sign(enclave=enclave, key=key, out=out, config=config)
     if returncode != 0:
-        raise Exception(
+        raise SGXSignError(
             f"sgx_sign failed for enclave file: {enclave}, key: {key}, out: {out}, config: {config}"
         )
     # FIXME handle errors in the above call, rather than proceeding forward despite

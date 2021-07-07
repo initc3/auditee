@@ -1,3 +1,4 @@
+import json
 import os
 from dataclasses import field
 from typing import Any
@@ -41,8 +42,20 @@ class IASReport:
         self.sgx_quote_t = unpack_b64_quote_body(self.isv_enclave_quote_body)
 
     @classmethod
-    def from_ias_report(cls, report):
-        return cls(**{report_attrs_rename_map[k]: v for k, v in report.items()})
+    def from_json(cls, report):
+        with open(report) as f:
+            report_dict = json.load(f)
+        report_dict.setdefault("nonce", "")
+        return cls(**{report_attrs_rename_map[k]: v for k, v in report_dict.items()})
+
+    def quote(self):
+        return unpack_b64_quote_body(self.isv_enclave_quote_body)
+
+    def report_body(self):
+        return self.quote().report_body
+
+    def mrenclave(self):
+        return bytes(self.report_body().mr_enclave.m)
 
 
 def send_quote(quote, *, ias_primary_key=None):
