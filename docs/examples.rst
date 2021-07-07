@@ -1,9 +1,5 @@
 Examples
 ========
-
-.. contents::
-    :depth: 2
-
 This section presents examples which can be followed through to see how the
 ``auditee`` tool can be used. Each example contains the source code of an
 enclave application, which for the sake of demonstration could be seen as

@@ -15,7 +15,8 @@ and using the SgxSign tool from Intel's linux-sgx.
 
 SIGSTRUCT
 ---------
-From `Intel SGX Explained`_ by Victor Costan and Srinivas Devadas:
+From `Intel SGX Explained`_ by Victor Costan and Srinivas Devadas
+:cite:`cryptoeprint:2016:086`:
 
 .. image:: _static/sigstruct.png
 

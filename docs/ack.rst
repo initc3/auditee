@@ -1,5 +1,5 @@
-Credits
-=======
+Acknowledgments
+===============
 Thanks to `IC3`_ (The Initiative For Cryptocurrencies & Contracts) for
 supporting this work.
 
