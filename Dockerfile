@@ -1,6 +1,6 @@
 FROM python:3
 
-COPY --from=initc3/linux-sgx:2.13-ubuntu20.04 /opt/sgxsdk/bin /opt/sgxsdk/bin
+COPY --from=initc3/linux-sgx:2.13.3-ubuntu20.04 /opt/sgxsdk/bin /opt/sgxsdk/bin
 
 RUN apt-get update && apt-get install -y \
                 vim \
@@ -37,3 +37,36 @@ RUN set -ex; \
         tee /etc/apt/sources.list.d/docker.list > /dev/null; \
     apt-get update; \
     apt-get install -y docker-ce-cli;
+
+# nix
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd -g $GID -o nix && \
+  useradd -m -u $UID -g $GID -o -s /bin/bash nix && \
+  usermod -aG sudo nix && \
+  DEBIAN_FRONTEND="noninteractive" apt-get update && \
+  apt-get install -y git curl wget sudo xz-utils && \
+  echo "nix ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/nix
+
+ENV USER nix
+USER nix
+
+WORKDIR /home/nix
+
+#COPY --chown=nix:nix ./nix.conf /home/nix/.config/nix/nix.conf
+
+RUN curl -L https://nixos.org/nix/install | sh
+
+RUN . /home/nix/.nix-profile/etc/profile.d/nix.sh && \
+  nix-channel --add https://nixos.org/channels/nixos-21.05 nixpkgs && \
+  nix-channel --update && \
+  nix-env -iA cachix -f https://cachix.org/api/v1/install && \
+  cachix use initc3
+
+ENV NIX_PROFILES "/nix/var/nix/profiles/default /home/nix/.nix-profile"
+ENV NIX_PATH /home/nix/.nix-defexpr/channels
+ENV NIX_SSL_CERT_FILE /etc/ssl/certs/ca-certificates.crt
+ENV PATH /home/nix/.nix-profile/bin:$PATH
+
+#RUN echo "cd ~/nix-workshop && source ./scripts/setup.sh" >> /home/nix/.profile

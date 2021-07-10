@@ -4,3 +4,4 @@
 [submodule "sgx-iot"]
 	path = examples/iot-gateway/sgx-iot
 	url = https://github.com/sbellem/sgx-iot.git
+	branch = dev

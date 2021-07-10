@@ -66,6 +66,8 @@ def verify_mrenclave(
             progress=docker_build_progress,
             **build_kwargs,
         )
+    elif builder == "nix-build":
+        raise NotImplementedError
 
     unsigned_enclave = pathlib.Path("/tmp/out").joinpath(build_config["enclave_file"])
     signing_key = pathlib.Path(__file__).parent.resolve().joinpath("signing_key.pem")
