@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+import subprocess
 from collections import namedtuple
 
 import yaml
@@ -20,6 +21,106 @@ ReproducibilityReport = namedtuple(
 ReportItem = namedtuple("ReportItem", ("matches", "expected", "computed"))
 
 
+def build_enclave(source_code, *, docker_build_progress=False):
+    """ """
+    source_code_path = pathlib.Path(source_code).resolve()
+    auditee_file = source_code_path.joinpath(".auditee.yml")
+
+    with open(auditee_file) as f:
+        auditee_config = yaml.safe_load(f)
+
+    enclave_build_config = auditee_config["enclaves"][0]
+
+    # Get absolute path of enclave config
+    # enclave_config = source_code_path.joinpath(enclave_build_config["enclave_config"])
+
+    build_config = enclave_build_config["build"]
+    builder = build_config["builder"]
+    build_kwargs = build_config["build_kwargs"]
+    os.chdir(source_code_path)
+    if builder == "docker":
+        docker.build(
+            output={"type": "local", "dest": "/tmp/out"},
+            progress=docker_build_progress,
+            **build_kwargs,
+        )
+    elif builder == "nix-build":
+        popenargs = [builder, build_kwargs.get("file", "default.nix")]
+        returncode = subprocess.run(popenargs).returncode
+        if returncode != 0:
+            raise RuntimeError(f"Error building enclave with {builder}")
+    os.chdir("..")
+    return source_code_path.joinpath(
+        build_config["output_dir"], build_config["enclave_file"]
+    )
+
+
+def sign_enclave(
+    unsigned_enclave,
+    enclave_config,
+    *,
+    signed_enclave="/tmp/enclave.signed.so",
+    signing_key=None,
+):
+    """ """
+    if signing_key is None:
+        signing_key = (
+            pathlib.Path(__file__).parent.resolve().joinpath("signing_key.pem")
+        )
+    else:
+        signing_key = pathlib.Path(signing_key).resolve()
+
+    sgx_sign(
+        unsigned_enclave,
+        key=signing_key,
+        out=signed_enclave,
+        config=pathlib.Path(enclave_config).resolve(),
+    )
+    return signed_enclave
+
+
+def extract_sigstruct(signed_enclave):
+    """ """
+    return Sigstruct.from_enclave_file(signed_enclave)
+
+
+def verify_ias_report(report, signed_enclave):
+    sigstruct = Sigstruct.from_enclave_file(signed_enclave)
+    return _verify_ias_report(report, sigstruct)
+
+
+def _verify_ias_report(report, sigstruct):
+    """ """
+    with open(report) as f:
+        report_data = json.load(f)
+
+    report_body = report_data["body"]
+    isv_enclave_quote_body = report_body["isvEnclaveQuoteBody"]
+    quote_body = read_sgx_quote_body_b64(isv_enclave_quote_body)
+    report_mrenclave = bytes(quote_body.report_body.mr_enclave.m)
+
+    print(
+        f"- Provided enclave MRENCLAVE: "
+        f"\t\t{term.bold}{sigstruct.mrenclave.hex()}{term.normal}"
+    )
+    print(
+        f"- IAS report MRENCLAVE: "
+        f"\t\t{term.bold}{report_mrenclave.hex()}{term.normal}"
+    )
+    print()
+
+    match = report_mrenclave == sigstruct.mrenclave
+    if match:
+        print(f"{term.green}MRENCLAVES match!{term.normal}")
+    else:
+        print(f"{term.red}MRENCLAVES do not match!{term.normal}")
+    return match
+
+
+def verify_signed_enclave(signed_enclave, sigstruct_data):
+    """ """
+
+
 def print_report(dev_mrenclave, audit_mrenclave, *, ias_report_mrenclave=None):
     print(f"\n{term.bold}Reproducibility Report\n----------------------{term.normal}")
     print(f"- Signed enclave MRENCLAVE: \t\t\t{term.bold}{dev_mrenclave}{term.normal}")
@@ -36,50 +137,42 @@ def print_report(dev_mrenclave, audit_mrenclave, *, ias_report_mrenclave=None):
 
 
 def verify_mrenclave(
-    src, signed_enclave, *, ias_report=None, docker_build_progress=False
+    source_code,
+    signed_enclave,
+    *,
+    ias_report=None,
+    docker_build_progress=False,
+    signing_key=None,
 ):
     """Given some source code, a signed enclave, and optionally, a remote attestation
     verification report from Intel's attestation service (IAS), verify whether
     the signed enclave binary can be reproduced from the given source code, and
     whether the IAS report corresponds to the given signed enclave.
     """
-    signed_enclave_path = pathlib.Path(signed_enclave).resolve()
-    if ias_report is not None:
-        ias_report = pathlib.Path(ias_report).resolve()
-    src_path = pathlib.Path(src).resolve()
-    enclavehub_file = src_path.joinpath(".enclavehub.yml")
-    with open(enclavehub_file) as f:
-        enclavehub_config = yaml.safe_load(f)
+    unsigned_enclave = build_enclave(
+        source_code, docker_build_progress=docker_build_progress
+    )
 
-    enclave_build_config = enclavehub_config["enclaves"][0]
+    source_code = pathlib.Path(source_code).resolve()
+    auditee_file = source_code.joinpath(".auditee.yml")
+
+    with open(auditee_file) as f:
+        auditee_config = yaml.safe_load(f)
+
+    enclave_build_config = auditee_config["enclaves"][0]
 
     # Get absolute path of enclave config
-    enclave_config = src_path.joinpath(enclave_build_config["enclave_config"])
+    enclave_config = source_code.joinpath(enclave_build_config["enclave_config"])
 
-    build_config = enclave_build_config["build"]
-    builder = build_config["builder"]
-    if builder == "docker":
-        build_kwargs = build_config["build_kwargs"]
-        os.chdir(src_path)
-        docker.build(
-            output={"type": "local", "dest": "/tmp/out"},
-            progress=docker_build_progress,
-            **build_kwargs,
-        )
-    elif builder == "nix-build":
-        raise NotImplementedError
-
-    unsigned_enclave = pathlib.Path("/tmp/out").joinpath(build_config["enclave_file"])
-    signing_key = pathlib.Path(__file__).parent.resolve().joinpath("signing_key.pem")
-    dev_sigstruct = Sigstruct.from_enclave_file(signed_enclave_path)
-    rebuilt_signed_enclave = "/tmp/rebuilt_enclave.signed.so"
-    sgx_sign(
-        unsigned_enclave,
-        key=signing_key,
-        out=rebuilt_signed_enclave,
-        config=enclave_config,
+    rebuilt_signed_enclave = sign_enclave(
+        unsigned_enclave, enclave_config, signing_key=signing_key
     )
+
+    if ias_report is not None:
+        ias_report = pathlib.Path(ias_report).resolve()
+
     auditor_sigstruct = Sigstruct.from_enclave_file(rebuilt_signed_enclave)
+    dev_sigstruct = Sigstruct.from_enclave_file(signed_enclave)
     if not ias_report:
         print_report(dev_sigstruct.mrenclave.hex(), auditor_sigstruct.mrenclave.hex())
         if auditor_sigstruct.mrenclave == dev_sigstruct.mrenclave:

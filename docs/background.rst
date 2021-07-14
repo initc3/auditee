@@ -2,7 +2,7 @@ Background
 ==========
 .. note:: *Still in draft.*
 
-Some brief notes and pointers about Intel SGX.
+Some brief notes and pointers about TEEs and Intel SGX.
 
 
 Measurement
@@ -29,29 +29,29 @@ There are 2 types of attestation:
 * _local_
 * _remote_
 
-Local attestation is when an enclave is attested by another enclave that "sits"
-on the same CPU. Remote attestation is when a third party, that does not need
-an SGX process requests a quote or report from a remote enclave, and sends that
-report to Intel for verification.
+Local attestation is when an enclave is attested by another enclave that
+"sits" on the same CPU. Remote attestation is when a third party, that does
+not need an SGX process requests a quote or report from a remote enclave, and
+sends that report to Intel for verification.
 
-In local attestation the verifier can verify the report without communicating with
-Intel, whereas in remote attestation the verifier must contact Intel for verifying
-the report.
+In local attestation the verifier can verify the report without communicating
+with Intel, whereas in remote attestation the verifier must contact Intel for
+verifying the report.
 
-In local attestation, the report contains a MAC tag which can verified by another
-enclave that runs on the same CPU, as it has access to the secret key that was used
-to create the MAC and which can be used to verify the MAC.
+In local attestation, the report contains a MAC tag which can verified by
+another enclave that runs on the same CPU, as it has access to the secret key
+that was used to create the MAC and which can be used to verify the MAC.
 
-In remote attestation, the enclave being attested generates a local attestation
-report which is verified by the Quoting Enclave (provided by Intel). According to
-the Intel SGX explained paper, the quoting enclave replaces the MAC of the report with
-a signature ... MUST check this in the code. The quoting enclave signs the report
-with an attesation key, that it obtains, encrypted, from a provisioning enclave.
-**The signature is encrypted.**
+In remote attestation, the enclave being attested generates a local
+attestation report which is verified by the Quoting Enclave (provided by
+Intel). According to the Intel SGX explained paper, the quoting enclave
+replaces the MAC of the report with a signature ... MUST check this in the
+code. The quoting enclave signs the report with an attesation key, that it
+obtains, encrypted, from a provisioning enclave. **The signature is
+encrypted.**
 
 Quote
 ^^^^^
-
 **Structure of a quote:**
 
 .. code-block:: cpp
@@ -75,8 +75,8 @@ Quote
 
 EPID signature verification
 """""""""""""""""""""""""""
-The Quoting Enclave, provided by Intel, is responsible for signing the quote, and
-it encrypts the signature:
+The Quoting Enclave, provided by Intel, is responsible for signing the quote,
+and it encrypts the signature:
 
 .. code-block:: cpp
 

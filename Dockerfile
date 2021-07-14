@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /usr/src
 
-COPY . .
+COPY LICENSE Makefile MANIFEST.in pyproject.toml setup.cfg setup.py ./
+COPY auditee .
 
 RUN pip install --upgrade pip
 RUN pip install --editable .[dev,docs,test]
@@ -70,3 +71,8 @@ ENV NIX_SSL_CERT_FILE /etc/ssl/certs/ca-certificates.crt
 ENV PATH /home/nix/.nix-profile/bin:$PATH
 
 #RUN echo "cd ~/nix-workshop && source ./scripts/setup.sh" >> /home/nix/.profile
+
+WORKDIR /usr/src
+COPY docs docs
+COPY tests tests
+COPY --chown=nix:nix examples examples
