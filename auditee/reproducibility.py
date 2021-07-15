@@ -22,7 +22,28 @@ ReportItem = namedtuple("ReportItem", ("matches", "expected", "computed"))
 
 
 def build_enclave(source_code, *, docker_build_progress=False):
-    """ """
+    """Build an enclave binary for the given source code.
+
+    The source code is expected to contain a file :file:`.auditee.yml`,
+    which instructs how to build the enclave. The supported builders
+    are ``nix-build`` and ``docker``.
+
+    Parameters
+    ----------
+    source_code: str
+        Local file path to the source code where the enclave to be built
+        is located.
+
+    Raises
+    ------
+    IOError:
+        If the ``.auditee.yml`` file is not found.
+
+    Returns
+    -------
+    str
+        File path to the enclave binary that was built.
+    """
     source_code_path = pathlib.Path(source_code).resolve()
     auditee_file = source_code_path.joinpath(".auditee.yml")
 
