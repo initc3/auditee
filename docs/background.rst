@@ -2,8 +2,29 @@ Background
 ==========
 .. note:: *Still in draft.*
 
-Some brief notes and pointers about TEEs and Intel SGX.
+Some brief notes and pointers about TEEs and Intel SGX, mostly based on
+`Intel SGX Explained`_ by Victor Costan and Srinivas Devadas
+:cite:`cryptoeprint:2016:086`.
 
+The goal of a Trusted Execution Environment is to have, at the chip or hardware level,
+a secure container in which some code can be executed such that the surrounding
+environment such as the operating system cannot tamper with the code and its execution.
+In the context of Intel SGX, this secure container is called an *enclave*.
+
+A user wishing to compute some function in an enclave can gain trust in the enclave
+via an attestation protocol. If the user of is performing the attestation from a
+different computer than the one running the enclave code, then this attestation
+protocol is referred to as a remote attestation, whereas a local attestation refers
+when the attestation protocol is executed from an enclave hosted on the same hardware
+than the enclave under attestation.
+
+The trust anchor is the chip manufacturer as it holds a cryptographic key from which
+multiple other cryptographic keys are derived, and which are crucial to the security
+of the TEE.
+
+Hardware
+--------
+Key material is burnt into efuses.
 
 Measurement
 -----------

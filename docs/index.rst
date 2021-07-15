@@ -35,6 +35,8 @@ See the examples documented under :ref:`sgx-hashmachine` and :ref:`sgx-iot-gatew
     :hidden:
 
     examples
+    config
+    tool
     background
     refs
     ack

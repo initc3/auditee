@@ -11,11 +11,26 @@ author = "Sylvain Bellemare"
 release = "0.0.1.dev0"
 
 extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
     "sphinxcontrib.bibtex",
     "sphinx_proof",
     "sphinx_togglebutton",
 ]
+
+# autodoc_default_options = {
+#    "members": None,
+#    "undoc-members": None,
+#    "private-members": None,
+#    "inherited-members": None,
+#    # "show-inheritance": None,
+# }
 
 bibtex_bibfiles = ["refs.bib"]
 todo_include_todos = True

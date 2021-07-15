@@ -1,26 +1,11 @@
-FROM python:3
+FROM python:3 as dev
 
+# SGX SDK
 COPY --from=initc3/linux-sgx:2.13.3-ubuntu20.04 /opt/sgxsdk/bin /opt/sgxsdk/bin
 
-RUN apt-get update && apt-get install -y \
-                vim \
-        && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /usr/src
-
-COPY LICENSE Makefile MANIFEST.in pyproject.toml setup.cfg setup.py ./
-COPY auditee .
-
-RUN pip install --upgrade pip
-RUN pip install --editable .[dev,docs,test]
-
-# download docker cli so it's already there,
-# to avoid downloading it at runtime
-# more information at:
+# Docker CLI
 # https://gabrieldemarmiesse.github.io/python-on-whales/docker_client/#the-docker-cli
-#RUN python-on-whales download-cli
-
-# docker cli
+# RUN python-on-whales download-cli
 RUN set -ex; \
     \
     apt-get update; \
@@ -38,17 +23,35 @@ RUN set -ex; \
         tee /etc/apt/sources.list.d/docker.list > /dev/null; \
     apt-get update; \
     apt-get install -y docker-ce-cli;
+RUN apt-get update && apt-get install -y \
+                vim \
+        && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /usr/src
+
+COPY LICENSE Makefile MANIFEST.in pyproject.toml setup.cfg setup.py ./
+COPY auditee .
+
+RUN pip install --upgrade pip
+RUN pip install --editable .[dev,docs,test]
+
+WORKDIR /usr/src
+COPY docs docs
+COPY tests tests
+COPY examples examples
+
+FROM dev as examples
 # nix
 ARG UID=1000
 ARG GID=1000
 
-RUN groupadd -g $GID -o nix && \
-  useradd -m -u $UID -g $GID -o -s /bin/bash nix && \
-  usermod -aG sudo nix && \
-  DEBIAN_FRONTEND="noninteractive" apt-get update && \
-  apt-get install -y git curl wget sudo xz-utils && \
-  echo "nix ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/nix
+ENV DEBIAN_FRONTEND "noninteractive"
+
+RUN apt-get update && apt-get install -y git curl wget sudo xz-utils
+RUN groupadd -g $GID -o nix \
+    && useradd -m -u $UID -g $GID -o -s /bin/bash nix \
+    && usermod -aG sudo nix \
+    && echo "nix ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/nix
 
 ENV USER nix
 USER nix
@@ -73,6 +76,4 @@ ENV PATH /home/nix/.nix-profile/bin:$PATH
 #RUN echo "cd ~/nix-workshop && source ./scripts/setup.sh" >> /home/nix/.profile
 
 WORKDIR /usr/src
-COPY docs docs
-COPY tests tests
 COPY --chown=nix:nix examples examples

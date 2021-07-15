@@ -18,10 +18,11 @@ services:
       - ./tests:/usr/src/tests
       - /var/run/docker.sock:/var/run/docker.sock
   builddocs:
-    image: auditee-local
+    image: auditee-dev
     build:
       context: .
       dockerfile: Dockerfile
+      target: dev
     volumes:
       - ./auditee:/usr/src/auditee
       - ./docs:/usr/src/docs

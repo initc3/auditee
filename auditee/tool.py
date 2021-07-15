@@ -1,3 +1,5 @@
+"""Main module for ``auditee`` tool."""
+
 import json
 import os
 import pathlib
