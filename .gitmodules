@@ -1,8 +1,8 @@
 [submodule "examples/hashmachine/sgx-hashmachine"]
 	path = examples/hashmachine/sgx-hashmachine
 	url = https://github.com/sbellem/sgx-hashmachine.git
-	branch = dev
+	branch = main
 [submodule "sgx-iot"]
 	path = examples/iot-gateway/sgx-iot
 	url = https://github.com/sbellem/sgx-iot.git
-	branch = dev
+	branch = main
