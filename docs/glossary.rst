@@ -1,1 +1,2 @@
-Seal Key
+Glossary
+========
