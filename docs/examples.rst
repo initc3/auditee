@@ -66,7 +66,7 @@ each iteration. For instance, in Python:
     for _ in range(1000000000):
         s = sha256(s).digest()
     end = time()
-    print(f'time to compute: {end - begin})'
+    print(f'time to compute: {end - begin}')
     print(f'computed value: {s}')
 
 You could perform the computation yourself, using the above code snippet, to
