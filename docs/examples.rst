@@ -33,7 +33,7 @@ field.
 Prerequisites
 -------------
 To follow through the examples as they are presented it's best that you have
-recent versions of `docker`_ and `<docker-compose>`_.
+recent versions of `docker`_ and `docker-compose`_.
 
 Clone the repository:
 
