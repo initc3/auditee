@@ -9,13 +9,13 @@ respect to security, functionalities, etc. In addition to the source code,
 each example contains a pre-built and signed enclave binary, usually named
 ``Enclave.signed.so``, and a remote attestation verification report from
 Intel's attestation service (IAS). In these examples, the IAS report is in a
-json file, usually named ``ias-report.json``, which also contains Intel's
+json file, usually named ``ias_report.json``, which also contains Intel's
 signature and certificate necessary to verify the authenticity of the report.
 To sum up, an example contains the following pieces of information:
 
 * enclave source code
 * pre-built signed enclave binary (``Enclave.signed.so``)
-* remote attestation report verified by Intel (``ias-report.json``)
+* remote attestation report verified by Intel (``ias_report.json``)
 
 A remote attestation report can contain application and/or user specific data
 in a field named ``REPORT_DATA``. This report data is added by the enclave
@@ -140,7 +140,7 @@ executed on a genuine SGX-enabled CPU.
 STEP 2: MRENCLAVEs Comparison
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Under the directory ``examples/hashmachine`` there's a file named
-``ias-report.json``. This file contains a remote attestation verification
+``ias_report.json``. This file contains a remote attestation verification
 report that was received from Intel's Attestation Service (IAS). The
 report contains the ``MRENCLAVE`` of the enclave that was attested and a
 ``REPORT_DATA`` value. The ``REPORT_DATA`` contains the hash that we care
@@ -183,7 +183,7 @@ tampered with.
     auditee.verify_mrenclave(
         'sgx-hashmachine/',
         'Enclave.signed.so',
-        ias_report='ias-report.json',
+        ias_report='ias_report.json',
     )
 
 .. code-block:: python
