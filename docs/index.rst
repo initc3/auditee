@@ -70,7 +70,7 @@ Here's an example for installing the SDK on Ubuntu 20.04, under ``$HOME``:
     ./sdk.bin --prefix=~/
     echo 'source ~/sgxsdk/environment' >> ~/.bashrc
 
-Here's an example for installing the SDK on Ubuntu 18.04, under ``~/``:
+Here's an example for installing the SDK on Ubuntu 18.04, under ``$HOME``:
 
 .. code-block:: shell
 
