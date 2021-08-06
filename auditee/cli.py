@@ -67,4 +67,8 @@ def main():
     mrenclave_parser.set_defaults(func=mrenclave)
 
     args = parser.parse_args()
-    args.func(args)
+    try:
+        args.func(args)
+    except AttributeError:
+        # TODO: Add more descriptive error messages for when there are more auditee commands
+        print("Too few arguments. Please use `auditee mrenclave --help` for more information")
