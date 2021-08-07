@@ -319,7 +319,7 @@ Go under the ``examples/iot`` directory:
 
 .. code-block:: shell
     
-    cd examples/iot
+    cd examples/iot-gateway
 
 Start an ``ipython`` session:
 
