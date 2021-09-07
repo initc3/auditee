@@ -1,4 +1,7 @@
 # auditee
+
+[![Join the chat at https://gitter.im/auditee/community](https://badges.gitter.im/auditee/community.svg)](https://gitter.im/auditee/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 **WORK IN PROGRESS** -- **Don't trust!**
 
 `auditee` is a tool to help verifying the reproducibility of Intel SGX
