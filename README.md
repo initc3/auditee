@@ -109,3 +109,8 @@ examples:
     Compute the MRENCLAVE from an IAS verification report:
     $ auditee mrenclave --ias-response ias_response.json
 ```
+
+## Contributing
+Contributions are welcome! We use the [Fork and pull model](https://docs.github.com/en/github/collaborating-with-pull-requests/getting-started/about-collaborative-development-models#fork-and-pull-model) to collaborate.
+
+Feel free to ask questions on gitter at https://gitter.im/auditee/community.
