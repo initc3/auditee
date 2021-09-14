@@ -1,6 +1,7 @@
 # auditee
 
 [![Join the chat at https://gitter.im/auditee/community](https://badges.gitter.im/auditee/community.svg)](https://gitter.im/auditee/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Documentation Status](https://readthedocs.org/projects/auditee/badge/?version=latest)](https://auditee.readthedocs.io/en/latest/?badge=latest)
 
 **WORK IN PROGRESS** -- **Don't trust!**
 
