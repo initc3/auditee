@@ -27,7 +27,7 @@ Clone the GitHub repository:
 
 .. code-block:: shell
 
-    $ git clone --recurse-submodules https://github.com/sbellem/auditee.git
+    $ git clone --recurse-submodules https://github.com/initc3/auditee.git
 
 Note the ``--recurse-submodules`` option to initialize the git submodules
 used in the examples.
@@ -54,7 +54,7 @@ Install ``auditee`` from GitHub:
 
 .. code-block:: shell
 
-    pip install git+https://github.com/sbellem/auditee.git
+    pip install git+https://github.com/initc3/auditee.git
 
 
 To install the SGX SDK, see https://01.org/intel-softwareguard-extensions/downloads/intel-sgx-linux-2.14-release.
