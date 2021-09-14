@@ -39,7 +39,7 @@ Clone the repository:
 
 .. code-block:: shell
 
-    $ git clone --recurse-submodules https://github.com/sbellem/auditee.git
+    $ git clone --recurse-submodules https://github.com/initc3/auditee.git
 
 
 .. _sgx-hashmachine:

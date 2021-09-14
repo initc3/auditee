@@ -23,7 +23,7 @@ is installed.
 Clone the GitHub repository:
 
 ```shell
-git clone --recurse-submodules https://github.com/sbellem/auditee.git
+git clone --recurse-submodules https://github.com/initc3/auditee.git
 ```
 
 Note the `--recurse-submodules` option to initialize the git submodules
@@ -49,7 +49,7 @@ source ~/.venvs/auditee/bin/activate
 Install `auditee` from GitHub:
 
 ```shell
-pip install git+https://github.com/sbellem/auditee.git
+pip install git+https://github.com/initc3/auditee.git
 ```
 
 To install the SGX SDK, see

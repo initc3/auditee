@@ -334,7 +334,7 @@ def verify_mrenclave(
 
     report_body = ias_report_data["body"]
     # TODO verify certificate & signature -- see issue #5
-    # https://github.com/sbellem/auditee/issues/5
+    # https://github.com/initc3/auditee/issues/5
     # report_headers = ias_report_data["headers"]
     isv_enclave_quote_body = report_body["isvEnclaveQuoteBody"]
     quote_body = read_sgx_quote_body_b64(isv_enclave_quote_body)

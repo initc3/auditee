@@ -46,14 +46,14 @@ html_theme = "sphinx_book_theme"
 html_title = "auditee"
 html_logo = "_static/logo.svg"
 html_theme_options = {
-    "repository_url": "https://github.com/sbellem/auditee",
+    "repository_url": "https://github.com/initc3/auditee",
     "use_repository_button": True,
     "use_download_button": True,
     "use_fullscreen_button": True,
     #    "logo": "logo.svg",
     #    "logo_name": True,
     #    "description": "Tool for Intel SGX Enclaves",
-    #    "github_user": "sbellem",
+    #    "github_user": "initc3",
     #    "github_repo": "auditee",
     #    "fixed_sidebar": True,
     #    "page_width": "1100px",
