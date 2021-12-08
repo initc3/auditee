@@ -12,27 +12,15 @@
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
-        "branch": "release-20.03",
+        "branch": "release-21.11",
         "description": "Nix Packages collection",
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "1db42b7fe3878f3f5f7a4f2dc210772fd080e205",
-        "sha256": "05k9y9ki6jhaqdhycnidnk5zrdzsdammbk5lsmsbz249hjhhgcgh",
+        "rev": "3f629e3dd5293bd3c211c4950c418f7cfb4501af",
+        "sha256": "0b9ynnwhpkfq849iydpg13i5qngasvpv2d7r98jwa2xzzwnz4cxa",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/1db42b7fe3878f3f5f7a4f2dc210772fd080e205.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
-    "sgx": {
-        "branch": "main",
-        "description": "Nix derivations for linux-sgx",
-        "homepage": null,
-        "owner": "initc3",
-        "repo": "nix-linux-sgx",
-        "rev": "5d81f7ec7fb8bae0e2b0af34aac0d479cc68e751",
-        "sha256": "0r9frl6hm7vwgphmrbc2izsfymvs171z3jm0gj5n0rsi95w1fsrh",
-        "type": "tarball",
-        "url": "https://github.com/initc3/nix-linux-sgx/archive/5d81f7ec7fb8bae0e2b0af34aac0d479cc68e751.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/3f629e3dd5293bd3c211c4950c418f7cfb4501af.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
