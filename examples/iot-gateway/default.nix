@@ -1,7 +1,6 @@
 let
   sources = import ./nix/sources.nix;
   pkgs = import sources.nixpkgs { };
-  sgx = import sources.sgx;
 in
 pkgs.stdenv.mkDerivation {
   name = "sgx-iot";
@@ -13,13 +12,13 @@ pkgs.stdenv.mkDerivation {
   src = pkgs.fetchFromGitHub {
     owner = "sbellem";
     repo = "sgx-iot";
-    rev = "5a90f6d7927ba567a9e3c28a22a6fa0e202bc1a5";
+    rev = "fadb5ac17d25ab180d58b95212c651329b2cd3f7";
     # Command to get the sha256 hash (note the --fetch-submodules arg):
-    # nix run -f '<nixpkgs>' nix-prefetch-github -c nix-prefetch-github --rev 5a90f6d7927ba567a9e3c28a22a6fa0e202bc1a5 sbellem sgx-iot
-    sha256 = "0rmiz08s1d27w1zfrnnkhpy7lh88hvbxqflp51030fp6mnkas65f";
+    # nix run -f '<nixpkgs>' nix-prefetch-github -c nix-prefetch-github --rev fadb5ac17d25ab180d58b95212c651329b2cd3f7 sbellem sgx-iot
+    sha256 = "1sism80fxhkdmqab8mwi4m39d89j94k7vfpq86n99bc8s6xwm9js";
   };
   preConfigure = ''
-    export SGX_SDK=${sgx.sgx-sdk}/sgxsdk
+    export SGX_SDK=${pkgs.sgx-sdk}/sgxsdk
     export PATH=$PATH:$SGX_SDK/bin:$SGX_SDK/bin/x64
     export PKG_CONFIG_PATH=$SGX_SDK/pkgconfig
     export LD_LIBRARY_PATH=$SGX_SDK/sdk_libs
@@ -28,7 +27,7 @@ pkgs.stdenv.mkDerivation {
     '';
   #configureFlags = ["--with-sgxsdk=$SGX_SDK"];
   buildInputs = with pkgs; [
-    sgx.sgx-sdk
+    sgx-sdk
     unixtools.xxd
     bashInteractive
     autoconf

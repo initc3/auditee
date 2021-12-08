@@ -63,10 +63,8 @@ WORKDIR /home/nix
 RUN curl -L https://nixos.org/nix/install | sh
 
 RUN . /home/nix/.nix-profile/etc/profile.d/nix.sh && \
-  nix-channel --add https://nixos.org/channels/nixos-21.05 nixpkgs && \
-  nix-channel --update && \
-  nix-env -iA cachix -f https://cachix.org/api/v1/install && \
-  cachix use initc3
+  nix-channel --add https://nixos.org/channels/nixos-21.11 nixpkgs && \
+  nix-channel --update
 
 ENV NIX_PROFILES "/nix/var/nix/profiles/default /home/nix/.nix-profile"
 ENV NIX_PATH /home/nix/.nix-defexpr/channels
